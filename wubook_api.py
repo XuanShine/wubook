@@ -58,7 +58,6 @@ class Wubook:
     def __init__(self, *args, **kwargs):
         self.server = xmlrpc.client.ServerProxy(url, verbose=False)
         self.returnCode, self.token = self.server.acquire_token(user, password, pkey)
-        del password
         if self.returnCode != 0:
             logger.warning("Can’t connect to server")
         else:
