@@ -119,3 +119,5 @@ docker-compose.override.yml
 .env.local
 .env.production
 .env.staging
+
+receipts.json
