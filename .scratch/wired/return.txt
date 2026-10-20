@@ -1,0 +1,92 @@
+
+
+
+
+[[return-values]]
+
+Return values
+
+Return values are shared between all procedures and have always the same format:
+
+ReturnCode, Info= function()
+
+which is generally rendered by many programming languages as an array of two elements.
+
+The first one, ReturnCode, is always an integer. In particular, for succesfull operations, and only
+for them, ReturnCode is zero.
+
+The second element, Info, changes depending by the called procedure.
+
+When ReturnCode is less than zero, something wrong happened. In that case,
+info is a string and contains a Human Readable Error: this way you
+can better understand what happened.
+
+When operations are succesfull, Info basically depends from a simple
+condition: does the called function need to return something? If the
+function does not need to return data (for example functions used to
+update availability), Info is generally a string,
+like Ok.
+
+For functions returning data (for example functions that return
+reservations), Info can be an Integer, a String or even a
+Complex Structure (like arrays or KV structs): check the
+An introduction to Wired section for more info.
+
+
+
+
+         Previous
+        Next
+
+
+
+
+
+
+© Copyright 2020, WuBook.
+
+
+
+  Built with Sphinx using a
+    theme
+    provided by Read the Docs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

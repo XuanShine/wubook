@@ -1,0 +1,197 @@
+
+
+
+
+[[an-introduction-to-wired]]
+
+An introduction to Wired
+
+You can contact us at help-wired - AT - wubook - DOT - net
+
+[[protocol]]
+
+Protocol
+
+The system is developed with the XML-RPC protocol.
+
+The URL to access the Wired function is https://wired.wubook.net/xrws/
+(and notice the final slash: it matters).
+
+Many libraries are available for almost all programming languages.
+Those libraries often allow a very easy development, by completely
+hiding the XML handling, which is built and sent by the libraries
+without the need to care about xml formatting.
+
+To better understand this concept, check the following examples:
+
+Note
+
+Keep in mind these are just generic examples and are here to give an idea of how the various languages can handle an XMLRPC connection. They are not tested, not working out of the box and shouldn’t be copy-pasted into your code.
+
+[[tab-0-UHl0aG9u]]
+Python
+[[tab-0-UEhQ]]
+PHP
+[[tab-0-SmF2YQ==]]
+Java
+[[tab-0-UnVieQ==]]
+Ruby
+[[panel-0-UHl0aG9u]]
+
+>>> import xmlrpc.client
+>>> server = xmlrpc.client.Server('https://wired.wubook.net/xrws/')
+>>> res, rooms = server.fetch_rooms(token, lcode)
+
+[[panel-0-UEhQ]]
+
+<?php
+  include("xmlrpc.inc");
+  $url= 'https://wired.wubook.net/xrws/';
+  $server = new xmlrpc_client($url);
+  $args= array(new xmlrpcval($token, 'string'), new xmlrpcval($lcode, 'string'));
+  $message = new xmlrpcmsg('fetch_rooms', $args);
+  $struct = $server->send($message)->value();
+?>
+
+[[panel-0-SmF2YQ==]]
+
+public String getToken(String token, String lcode) throws Exception {
+  Vector<String> params = new Vector<String>();
+  params.addElement(token);
+  params.addElement(lcode);
+  Object[] objects = (Object[]) xmlRpcClient.execute(config, "fetch_rooms", params);
+  return objects;
+}
+
+[[panel-0-UnVieQ==]]
+
+# ruby (code provided by Intelligent Mobile, see below)
+require 'xmlrpc/client'
+api_result = server.call("fetch_rooms", @config['token'], @config['lcode'])
+status = api_result[0]
+@rooms = api_result[1]
+
+Need additional information about the XML-RPC protocol? Wikipedia is obviously
+a good starting point and already lists several
+well known libraries for each programming language:
+
+http://en.wikipedia.org/wiki/XML-RPC
+
+If you use Ruby, have a look at the following library on github (here).
+A gem file is also available there.
+
+So, by using a library you will have to deal with Simple Data (integers, strings, floats and so on), Arrays and Structs.
+If you don’t want to use an high level library and you want to produce and post XML, make sure to develop propedeutic functions
+to represent these data types. A good resource is available at this link.
+
+[[anti-flood-policies]]
+
+Anti Flood Policies
+
+This part is very important to understand and implement, otherwise you might get marked as a flooder
+and, based on the kind of floodin, have your access restricted in different ways.
+
+There are several kind of anti-abuses policies:
+
+Per function: almost all functions have limits. This means you can not
+call them more then N times in M seconds (N and M depending on the fucction).
+
+Global: global number of calls
+
+Room values: to prevent too many updates for the same room
+
+[[push-notification]]
+
+Push Notification
+
+Enabling the Push Notification is essential to develop a faster, elegant and reliable approach.
+
+Instead of periodically asking our servers for new reservations, consider the idea to establish a
+notification layer. Wired is able to notify you when a new reservation is ready to be fetched,
+so you can get it individually using the fetch_booking() call.
+This will optmize a lot your/our servers load.
+
+Note
+
+Even if you choose to deploy the Push Notification, it’s important to schedule a fetching
+call with a 2 hours frequence, just in case some notification will be lost.
+
+To know more about this good approach, take a look: at this page.
+
+[[development-and-debugging]]
+
+Development and debugging
+
+During the first steps of the development, rely on our collaboration. This is
+-obviously- the moment when we provide more support to our providers. If you
+need help, for example because you can’t succesfully call a function, it’s very
+important to send us the XML you’re sending to our servers.
+
+As stated before,
+if you use high level libraries, you will probably skip the XML production.
+However, each library, given a call and its arguments, allows to produce
+the related xml (instead of automatically producing it under the hood and sending
+it to the servers).
+
+So, please, as one of your first step, try to understand how to use your library
+to produce XML without sending it, so that we will be able to help you in the
+case you will encounter issues.
+
+
+
+
+         Previous
+        Next
+
+
+
+
+
+
+© Copyright 2020, WuBook.
+
+
+
+  Built with Sphinx using a
+    theme
+    provided by Read the Docs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

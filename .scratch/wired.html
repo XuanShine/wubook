@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<meta content="WuBook XML API, Wired: channel manager proxy, extranet management" name="description" />
+<meta content="Wired, WuBook, xml, api, channel manager, booking engine, proxy" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wired &mdash; WuBook Technical Docs  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" href="_static/rtd_custom_css.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/rtd_custom_js.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="An introduction to Wired" href="wired/onboarding.html" />
+    <link rel="prev" title="Welcome to WuBook’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/wubook_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Wired Api</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/onboarding.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/policies.html">Anti-abuse policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/certification.html">Certification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/return.html">Return values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/auth.html">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rooms.html">Handling rooms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/avail.html">Updating availability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/prices.html">Handling prices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rstrs.html">Handling restrictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html">Fetching reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rsrvs.html">Handling reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/woodoo.html">Channel manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/cpolicies.html">Cancellation Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/extras.html">Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/transactions.html">Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/corps.html">Corporate functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/chainwidget.html">Chain Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/webhooks.html">Webhooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/errormessages.html">Error codes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ord.html">Online Reception</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fount.html">Fount</a></li>
+<li class="toctree-l1"><a class="reference internal" href="woodooapi.html">WooDooApi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kapi.html">Zak API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">WuBook Technical Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Wired</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/wired.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="wired">
+<h1>Wired<a class="headerlink" href="#wired" title="Permalink to this heading"></a></h1>
+<p>API documentation. Do you want to programmatically manage WuBook?
+Well, the following chapters are what you are looking for!</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="wired/onboarding.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/onboarding.html#protocol">Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/onboarding.html#anti-flood-policies">Anti Flood Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/onboarding.html#push-notification">Push Notification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/onboarding.html#development-and-debugging">Development and debugging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/policies.html">Anti-abuse policies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/policies.html#motivations">Motivations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/policies.html#anti-flood-policies">Anti Flood Policies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/policies.html#function-limits">Function limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/policies.html#global-limits">Global limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/policies.html#rooms-values">Rooms values</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/policies.html#what-happens-if-you-re-tagged-as-flooder">What happens if you’re tagged as Flooder?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/certification.html">Certification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wired/return.html">Return values</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wired/auth.html">Authentication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/auth.html#property-identifier">Property Identifier</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/rooms.html">Handling rooms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/rooms.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rooms.html#fetching-existing-rooms">Fetching existing rooms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#fetch_rooms"><code class="docutils literal notranslate"><span class="pre">fetch_rooms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#fetch_single_room"><code class="docutils literal notranslate"><span class="pre">fetch_single_room()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rooms.html#adding-a-new-room">Adding a new room</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#new_room"><code class="docutils literal notranslate"><span class="pre">new_room()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#new_virtual_room"><code class="docutils literal notranslate"><span class="pre">new_virtual_room()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rooms.html#modifying-a-room">Modifying a room</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#mod_room"><code class="docutils literal notranslate"><span class="pre">mod_room()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#mod_virtual_room"><code class="docutils literal notranslate"><span class="pre">mod_virtual_room()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rooms.html#removing-a-room">Removing a room</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#del_room"><code class="docutils literal notranslate"><span class="pre">del_room()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rooms.html#other-functions">Other functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#room_images"><code class="docutils literal notranslate"><span class="pre">room_images()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rooms.html#update-functions">Update Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#push_update_activation"><code class="docutils literal notranslate"><span class="pre">push_update_activation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/rooms.html#push_update_url"><code class="docutils literal notranslate"><span class="pre">push_update_url()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/avail.html">Updating availability</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/avail.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/avail.html#updating-availability">Updating availability</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/avail.html#update_avail"><code class="docutils literal notranslate"><span class="pre">update_avail()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/avail.html#update_sparse_avail"><code class="docutils literal notranslate"><span class="pre">update_sparse_avail()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/avail.html#using-update-avail">Using update_avail()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/avail.html#sparse-updates-using-update-sparse-avail">Sparse updates ( using update_sparse_avail() )</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/avail.html#reading-current-values">Reading current values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/avail.html#fetch_rooms_values"><code class="docutils literal notranslate"><span class="pre">fetch_rooms_values()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/prices.html">Handling prices</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/prices.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/prices.html#the-wubook-parity">The WuBook Parity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/prices.html#pricing-plans-management">Pricing plans management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/prices.html#add_pricing_plan"><code class="docutils literal notranslate"><span class="pre">add_pricing_plan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/prices.html#add_vplan"><code class="docutils literal notranslate"><span class="pre">add_vplan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/prices.html#del_plan"><code class="docutils literal notranslate"><span class="pre">del_plan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/prices.html#update_plan_name"><code class="docutils literal notranslate"><span class="pre">update_plan_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/prices.html#get_pricing_plans"><code class="docutils literal notranslate"><span class="pre">get_pricing_plans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/prices.html#update_plan_rack"><code class="docutils literal notranslate"><span class="pre">update_plan_rack()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/prices.html#mod_vplans"><code class="docutils literal notranslate"><span class="pre">mod_vplans()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/prices.html#handling-pricing-plans">Handling Pricing Plans</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/prices.html#update_plan_prices"><code class="docutils literal notranslate"><span class="pre">update_plan_prices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/prices.html#fetch_plan_prices"><code class="docutils literal notranslate"><span class="pre">fetch_plan_prices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/prices.html#handling-intensive-plans-deprecated-do-not-implement">Handling Intensive Plans (DEPRECATED, do NOT implement)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/rstrs.html">Handling restrictions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/rstrs.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rstrs.html#adding-and-removing-restriction-plans">Adding and removing Restriction Plans</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/rstrs.html#rplan_add_rplan"><code class="docutils literal notranslate"><span class="pre">rplan_add_rplan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/rstrs.html#rplan_rplans"><code class="docutils literal notranslate"><span class="pre">rplan_rplans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/rstrs.html#rplan_del_rplan"><code class="docutils literal notranslate"><span class="pre">rplan_del_rplan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/rstrs.html#rplan_rename_rplan"><code class="docutils literal notranslate"><span class="pre">rplan_rename_rplan()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rstrs.html#managing-restrictions">Managing restrictions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/rstrs.html#rplan_update_rplan_rules"><code class="docutils literal notranslate"><span class="pre">rplan_update_rplan_rules()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/rstrs.html#rplan_update_rplan_values"><code class="docutils literal notranslate"><span class="pre">rplan_update_rplan_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/rstrs.html#rplan_get_rplan_values"><code class="docutils literal notranslate"><span class="pre">rplan_get_rplan_values()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/fetch.html">Fetching reservations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html#basic-concepts">Basic concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html#setting-up-the-push-notification">Setting up the Push Notification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#push_activation"><code class="docutils literal notranslate"><span class="pre">push_activation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#push_url"><code class="docutils literal notranslate"><span class="pre">push_url()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html#fetching-a-single-reservation">Fetching a single reservation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#fetch_booking"><code class="docutils literal notranslate"><span class="pre">fetch_booking()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html#fetching-fresh-reservations">Fetching fresh reservations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#fetch_new_bookings"><code class="docutils literal notranslate"><span class="pre">fetch_new_bookings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#mark_bookings"><code class="docutils literal notranslate"><span class="pre">mark_bookings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html#fetching-for-the-first-time">Fetching for the first time</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#ignoring-existing-reservations">Ignoring existing reservations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#fetching-all-existing-reservations">Fetching all existing reservations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html#reservation-representations">Reservation representations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html#reservation-modifications">Reservation modifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html#other-functions">Other functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#fetch_bookings"><code class="docutils literal notranslate"><span class="pre">fetch_bookings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#fetch_deleted_bookings"><code class="docutils literal notranslate"><span class="pre">fetch_deleted_bookings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#fetch_bookings_codes"><code class="docutils literal notranslate"><span class="pre">fetch_bookings_codes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/fetch.html#get_fount_symbols"><code class="docutils literal notranslate"><span class="pre">get_fount_symbols()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/fetch.html#xml-examples">XML Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/rsrvs.html">Handling reservations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/rsrvs.html#cancel_reservation"><code class="docutils literal notranslate"><span class="pre">cancel_reservation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rsrvs.html#confirm_reservation"><code class="docutils literal notranslate"><span class="pre">confirm_reservation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rsrvs.html#reconfirm_reservation"><code class="docutils literal notranslate"><span class="pre">reconfirm_reservation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/rsrvs.html#new_reservation"><code class="docutils literal notranslate"><span class="pre">new_reservation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/woodoo.html">Channel manager</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/woodoo.html#introduction">Introduction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#get_channels_info"><code class="docutils literal notranslate"><span class="pre">get_channels_info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/woodoo.html#channels-management">Channels Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#get_otas"><code class="docutils literal notranslate"><span class="pre">get_otas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#tag_ota"><code class="docutils literal notranslate"><span class="pre">tag_ota()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#new_ota"><code class="docutils literal notranslate"><span class="pre">new_ota()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#ota_running"><code class="docutils literal notranslate"><span class="pre">ota_running()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#fetch_rsrv_errors"><code class="docutils literal notranslate"><span class="pre">fetch_rsrv_errors()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/woodoo.html#booking-com-configuration">Booking.com Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_start_procedure"><code class="docutils literal notranslate"><span class="pre">bcom_start_procedure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_confirm_activation"><code class="docutils literal notranslate"><span class="pre">bcom_confirm_activation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_init_channel"><code class="docutils literal notranslate"><span class="pre">bcom_init_channel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_rooms_rates"><code class="docutils literal notranslate"><span class="pre">bcom_rooms_rates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_set_room_mapping"><code class="docutils literal notranslate"><span class="pre">bcom_set_room_mapping()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_set_rate_mapping"><code class="docutils literal notranslate"><span class="pre">bcom_set_rate_mapping()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_read_allotments"><code class="docutils literal notranslate"><span class="pre">bcom_read_allotments()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_notify_noshow"><code class="docutils literal notranslate"><span class="pre">bcom_notify_noshow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_notify_invalid_cc"><code class="docutils literal notranslate"><span class="pre">bcom_notify_invalid_cc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_get_advance_booking"><code class="docutils literal notranslate"><span class="pre">bcom_get_advance_booking()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#bcom_set_advance_booking"><code class="docutils literal notranslate"><span class="pre">bcom_set_advance_booking()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/woodoo.html#expedia-configuration">Expedia Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#exp_start_procedure"><code class="docutils literal notranslate"><span class="pre">exp_start_procedure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#exp_vat_models"><code class="docutils literal notranslate"><span class="pre">exp_vat_models()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#exp_init_channel"><code class="docutils literal notranslate"><span class="pre">exp_init_channel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#exp_rooms_rates"><code class="docutils literal notranslate"><span class="pre">exp_rooms_rates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#exp_set_room_mapping"><code class="docutils literal notranslate"><span class="pre">exp_set_room_mapping()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#exp_set_rate_mapping"><code class="docutils literal notranslate"><span class="pre">exp_set_rate_mapping()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#exp_set_preferences"><code class="docutils literal notranslate"><span class="pre">exp_set_preferences()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/woodoo.html#updates-management">Updates management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#woodoo_suspended_commands"><code class="docutils literal notranslate"><span class="pre">woodoo_suspended_commands()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#woodoo_executed_commands"><code class="docutils literal notranslate"><span class="pre">woodoo_executed_commands()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#woodoo_cancel_suspended"><code class="docutils literal notranslate"><span class="pre">woodoo_cancel_suspended()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#woodoo_relaunch_suspended"><code class="docutils literal notranslate"><span class="pre">woodoo_relaunch_suspended()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/woodoo.html#channels-settings">Channels Settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#last_room_channels"><code class="docutils literal notranslate"><span class="pre">last_room_channels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/woodoo.html#woodoo_basic_yield"><code class="docutils literal notranslate"><span class="pre">woodoo_basic_yield()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/woodoo.html#airbnb-messaging">AirBnb Messaging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/cpolicies.html">Cancellation Policies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/cpolicies.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/cpolicies.html#policy-master">Policy Master</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/cpolicies.html#policies-calendar">Policies Calendar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/cpolicies.html#handling-policies">Handling Policies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/cpolicies.html#policy-characteristics">Policy characteristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/cpolicies.html#fetching-existing-policies">Fetching existing Policies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/cpolicies.html#adding-a-new-policy">Adding a new Policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/cpolicies.html#modifying-an-existing-policy">Modifying an existing Policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/cpolicies.html#deleting-an-existing-policy">Deleting an existing Policy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/cpolicies.html#handling-policies-calendar">Handling Policies Calendar</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/cpolicies.html#fetching-policies-calendar">Fetching Policies Calendar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/cpolicies.html#modifying-policies-calendar">Modifying Policies Calendar</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/extras.html">Extras</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/extras.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/extras.html#opportunities">Opportunities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#opportunity-characteristics">Opportunity characteristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#fetching-existing-opportunities">Fetching existing Opportunities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#adding-a-new-opportunity">Adding a new Opportunity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#modifying-an-existing-opportunity">Modifying an existing Opportunity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#deleting-an-existing-opportunity">Deleting an existing Opportunity</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/extras.html#special-offers">Special Offers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#special-offers-characteristics">Special Offers characteristics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#fetching-existing-special-offers">Fetching existing Special Offers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#adding-a-new-special-offer">Adding a new Special Offer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#modifying-an-existing-special-offer">Modifying an existing Special Offer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#deleting-an-existing-special-offer">Deleting an existing Special Offer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/extras.html#promo-codes">Promo Codes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#adding-a-new-promo-code">Adding a new Promo Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/extras.html#deleting-an-existing-promo-code">Deleting an existing Promo Code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/transactions.html">Transactions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/transactions.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/transactions.html#filter-params">Filter params</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/transactions.html#anatomy-of-the-datas">Anatomy of the datas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/transactions.html#available-functions">Available functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/transactions.html#read_balance"><code class="docutils literal notranslate"><span class="pre">read_balance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/transactions.html#read_subaccount_balance"><code class="docutils literal notranslate"><span class="pre">read_subaccount_balance()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/transactions.html#working-with-waiting-balances">Working with waiting balances</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/transactions.html#pay_balance"><code class="docutils literal notranslate"><span class="pre">pay_balance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/transactions.html#detach_balance"><code class="docutils literal notranslate"><span class="pre">detach_balance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/transactions.html#pay_balance_with_credit"><code class="docutils literal notranslate"><span class="pre">pay_balance_with_credit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/corps.html">Corporate functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/corps.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/corps.html#global-information">Global Information</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_fetch_accounts"><code class="docutils literal notranslate"><span class="pre">corporate_fetch_accounts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_get_providers_info"><code class="docutils literal notranslate"><span class="pre">corporate_get_providers_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_fetch_channels"><code class="docutils literal notranslate"><span class="pre">corporate_fetch_channels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_get_channels"><code class="docutils literal notranslate"><span class="pre">corporate_get_channels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_fetchable_properties"><code class="docutils literal notranslate"><span class="pre">corporate_fetchable_properties()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/corps.html#create-accounts-and-properties">Create accounts and properties</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_new_property"><code class="docutils literal notranslate"><span class="pre">corporate_new_property()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_new_account_and_property"><code class="docutils literal notranslate"><span class="pre">corporate_new_account_and_property()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/corps.html#managing-subaccounts-and-properties">Managing subaccounts and properties</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_destroy_subaccount"><code class="docutils literal notranslate"><span class="pre">corporate_destroy_subaccount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_remove_property"><code class="docutils literal notranslate"><span class="pre">corporate_remove_property()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/corps.html#renewing-services">Renewing services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_set_channel_status"><code class="docutils literal notranslate"><span class="pre">corporate_set_channel_status()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/corps.html#balance-and-transactions">Balance and transactions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_balance_transactions"><code class="docutils literal notranslate"><span class="pre">corporate_balance_transactions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#corporate_balance_details"><code class="docutils literal notranslate"><span class="pre">corporate_balance_details()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="wired/corps.html#dtype_mapping"><code class="docutils literal notranslate"><span class="pre">dtype_mapping()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wired/corps.html#compatible-timezones-for-a-new-property">Compatible timezones for a new property</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/chainwidget.html">Chain Widget</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wired/webhooks.html">Webhooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wired/webhooks.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/webhooks.html#whitelabel-communication">Whitelabel Communication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wired/webhooks.html#airbnb-messaging">AirBnb Messaging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wired/errormessages.html">Error codes</a></li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to WuBook’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="wired/onboarding.html" class="btn btn-neutral float-right" title="An introduction to Wired" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, WuBook.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+<!--<div style="margin-left:620px">-->
+<!--<a style="color:red" href="http://en.wubook.net">WuBook Website</a> -->
+<!--<style>-->
+<!--.descname {-->
+        <!--color: #E69138;-->
+        <!--}-->
+        <!--div.note {-->
+                <!--background-color: #ddffd1;-->
+                <!--}-->
+                <!--.sphinxsidebarwrapper_zzz {-->
+                        <!--border-right: 1px solid #999999;-->
+                        <!--}-->
+                        <!--h1 {-->
+                                <!--font-size: 180% !important;-->
+                                <!--color: #db0000 !important;-->
+                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                <!--}-->
+                                <!--h2 {-->
+                                        <!--font-size: 160% !important;-->
+                                        <!--color: #db0000 !important;-->
+                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                        <!--}-->
+                                        <!--p {-->
+                                                <!--font-size: 110% !important;-->
+                                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                <!--color: #3E4349-->
+                                                <!--}-->
+                                                <!--div.body {-->
+                                                        <!--font-size: 110% !important;-->
+                                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                        <!--color: #3E4349-->
+                                                        <!--}-->
+                                                        <!--</style>-->
+<!--</div>-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-4959530-27', 'auto');
+    ga('set', 'anonymizeIp', true);
+    ga('send', 'pageview');
+</script>
+   
+
+
+</body>
+</html>

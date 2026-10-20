@@ -1,0 +1,265 @@
+
+
+
+
+[[policies-against-abuses]]
+
+Policies against abuses
+
+[[motivations]]
+
+Motivations
+
+Tourism data is heavy and, sometimes, computations are far from being fast.
+So, a programmatic management produces sensible computational costs.
+In particular, a bad approach or a poor programming architecture on
+the client side can even compromise the server side.
+
+By the way, this happened several times. Results are rarely dramatic, but
+we want Wired to be always fast and responsive.
+
+For this reason, we apply Anti-Flood policies, blocking clients which
+issue too many calls (abuses) and eventually compromising the
+usage of other providers.
+
+Note
+
+limits are very high. If you break them, rely
+on the fact that you’re surely badly using the service. For example,
+we allow 12 years (365 * 12 days) of updates for each room on 3 minutes.
+Notice also that limits are not provider-related, but property/room based.
+
+This means that if you develop with intelligence, you don’t even need
+to take policies into consideration.
+
+[[anti-flood-policies]]
+
+Anti Flood Policies
+
+There are several kind of anti-abuses policies:
+
+Per function: almost all functions have limits. This means you can not
+call them more then N times in M seconds (N and M depending on the fucction).
+
+Global: global number of calls
+
+Room values: to prevent too many updates for the same room
+
+[[function-limits]]
+
+Function limits
+
+The following functions are limited. You can not call them so frequently:
+
+Function
+
+Max Calls
+
+Time window (seconds)
+
+fetch_rooms_values
+
+240
+
+43200
+
+rplan_get_rplan_values
+
+240
+
+43200
+
+wired_rplan_get_rplan_values
+
+240
+
+43200
+
+fetch_bookings
+
+288
+
+43200
+
+fetch_bookings_codes
+
+24
+
+3600
+
+fetch_rooms
+
+240
+
+86400
+
+fetch_single_room
+
+187
+
+86400
+
+get_plans
+
+120
+
+86400
+
+rplan_rplans
+
+240
+
+86400
+
+fetch_ccard
+
+40
+
+3600
+
+bcom_read_allotments
+
+95
+
+86400
+
+fetch_rsrv_errors
+
+12
+
+3600
+
+update_plan_periods
+
+200
+
+3600
+
+update_avail
+
+200
+
+3600
+
+[[global-limits]]
+
+Global limits
+
+Given a property, it’s not possible to launch more than 600 calls
+in  3600 seconds (operations related to this property).
+
+[[rooms-values]]
+
+Rooms values
+
+For functions updating room values (like availability, prices, restrictions and so on),
+for example update_avail(), there is a maximum number of updatable days (for
+each room) depending on the time window.
+
+Number of updated days
+
+Time window (seconds)
+
+1460
+
+1
+
+4380
+
+180
+
+13140
+
+3600
+
+25550
+
+43200
+
+29200
+
+86400
+
+32850
+
+172800
+
+36500
+
+259200
+
+Note
+
+A single call (for example update_avail), can update max 16000 days, this limit is not per room but it is calculated by the sum of all rooms selected.
+
+[[what-happens-if-you-re-tagged-as-flooder]]
+
+What happens if you’re tagged as Flooder?
+
+Unless our staff manually resets your counters, you must wait a sufficient amount of time to use again
+the functions for which you exceeded limits. That’s because limits are always related to
+a time window.
+
+Note
+
+Notice we work 7x7 and if this happens, we will help. Anyway, to prevent inconveniences,
+make sure to develop your client side by respecting limits.
+
+
+
+
+         Previous
+        Next
+
+
+
+
+
+
+© Copyright 2020, WuBook.
+
+
+
+  Built with Sphinx using a
+    theme
+    provided by Read the Docs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

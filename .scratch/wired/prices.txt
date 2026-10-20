@@ -1,0 +1,413 @@
+
+
+
+
+[[handling-prices]]
+
+Handling Prices
+
+[[introduction]]
+
+Introduction
+
+WuBook supports multiple Pricing Plans for each property, also known as rates.
+If you connect
+WuBook to provide a channel manager service, you need to provide the possibility
+to manage them,
+because the connectivity to your OTAs depends on that: booking.com and expedia, for
+example, require different prices for different rates and you must be able to
+manage these features.
+
+[[the-wubook-parity]]
+
+The WuBook Parity
+
+Each property has a standard pricing plan: the WuBook Parity.
+This pricing plan contains the default
+prices for the Online Reception (the wubook booking engine). If the Online
+Reception of WuBook is not used, the WuBook Parity is like another pricing
+plan, without particular features.
+
+Note
+
+the WuBook Parity Pricing Plan has always ID= 0 for each property
+and can not be removed
+
+[[pricing-plans-management]]
+
+Pricing plans management
+
+To add a new Pricing Plan, the following function is used:
+
+[[add_pricing_plan]]
+
+add_pricing_plan(token, lcode, name)
+
+This function returns the ID of the new plan.
+
+To add a new Virtual Pricing Plan, you use:
+
+[[add_vplan]]
+
+add_vplan(token, lcode, name, pid, dtype, value)
+
+Where pid is the Plan Id of the Parent Pricing Plan, while
+dtype is an integer:
+
+-2: This plan is a discount. Value is a fixed amount
+
+-1: This plan is a discount. Value is a percentage
+
+1:  This plan increases prices. Value is a percentage
+
+2:  This plan increases prices. Value is a fixed amount
+
+Given the dtype integer, value is the quantity of the
+variation (a float or an integer), for example:
+
+variation= 10, variation_type= 1: you have an increase of 10%
+
+variation= 30, variation_type= -2: you have a decrease of 30 EUR (currency being obviously dynamic)
+
+Note
+
+Functions adding a new plan always return the assigned ID
+
+To remove a pricing plan, one uses:
+
+[[del_plan]]
+
+del_plan(token, lcode, pid)
+
+where pid is the ID of the plan which must be removed.
+
+To update the name of a pricing plan:
+
+[[update_plan_name]]
+
+update_plan_name(token, lcode, pid, name)
+
+Finally, to fetch the existing pricing plans of a property, there is
+the following function:
+
+[[get_pricing_plans]]
+
+get_pricing_plans(token, lcode)
+
+The return value of this call is an array, each element being a Pricing Plan.
+Each item is a KV structure, containing the following fields:
+
+Field
+
+Description
+
+id
+
+Eh, the ID of the plan
+
+name
+
+The name of the plan
+
+daily
+
+1 for daily plans
+
+vpid
+
+If plan is virtual, this is the PID (plan id) of its parent
+
+variation
+
+If plan is virtual, this is the price variation amount
+
+variation_type
+
+If plan is virtual, this is the price variation type
+
+About variation and variation_type, check the documentation of
+add_vplan()
+
+[[update_plan_rack]]
+
+update_plan_rack(token, lcode, pid, rack)
+
+Pricing plans have default values (when default values of a pricing plan are not
+specified, the default prices become the default room prices, see the rooms
+section). The update_plan_rack() function is used to modify them.
+
+Note
+
+not available for the WuBook Parity Pricing Plan (ID= 0)
+
+The rack argument is a KV structure:
+
+{
+  '1': [1,2,3,4,5,6,7],
+  '2': [1,2,3,4,5,6,7],
+}
+
+For each room, you specify the default price depending on the day of the week
+(so, arrays have always lenght= 7).
+
+[[mod_vplans]]
+
+mod_vplans(token, lcode, plans)
+
+The function mod_vplans allows to manage Virtual
+Plans, modifying the variation and the variation_type. The plans
+argument is an array of KV structures, each one containing information about
+the ID of the plan and the desired variation_type/variation, like that:
+
+plans= [{'pid': 1, 'variation': 10, 'variation_type': 1}, {'pid': 2, 'variation': 10, 'variation_type': -2}]
+
+[[handling-pricing-plans]]
+
+Handling Pricing Plans
+
+There are just two functions to completely manage Daily Pricing Plans. One is
+used to write, the other to read:
+
+[[update_plan_prices]]
+
+update_plan_prices(token, lcode, pid, dfrom, prices)
+
+[[fetch_plan_prices]]
+
+fetch_plan_prices(token, lcode, pid, dfrom, dto[, rooms= []])
+
+To update the values of a Pricing Plan, you use update_plan_prices().
+The pid parameter is the ID of the Pricing Plan you want to modify.
+The dfrom parameter is the Starting Date (european format: 21/12/2021).
+The prices parameter is a KV structure. Keys are Room IDs. Values are
+array of prices. Prices must be greater than 0.01.
+The following example will explain it better:
+
+prices= {
+  "1": [100, 101, 102],
+  "2": [200, 201, 202]
+}
+
+The previuos KV structure is used to setup the following prices (assming
+dfrom= 21/12/2021):
+
+Room Id: 1
+  21/12: 100
+  22/12: 101
+  23/12: 102
+
+Room Id: 2
+  21/12: 200
+  22/12: 201
+  23/12: 202
+
+The underlying xml (for the Room with id= 1) is:
+
+<struct>
+  <member>
+    <name>1</name>
+    <value>
+      <array><data>
+        <value><int>100</int></value>
+        <value><int>101</int></value>
+        <value><int>102</int></value>
+      </data></array>
+    </value>
+  </member>
+  <member>
+    <name>2</name>
+    <value>
+      ....
+    </value>
+  </member>
+</struct>
+
+Finally, click on the following link for a full representation of the update call described on our example.
+
++ show/hide code
+[[hiddencodeblock27]]
+
+<methodCall>
+  <methodName>update_plan_prices</methodName>
+  <params>
+    <param>
+      <value>
+        <string>9924436598.9239</string>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>1234234</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>0</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <string>10/10/2017</string>
+      </value>
+    </param>
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>2</name>
+            <value>
+              <array>
+                <data>
+                  <value>
+                    <double>1.1</double>
+                  </value>
+                  <value>
+                    <int>2</int>
+                  </value>
+                  <value>
+                    <int>3</int>
+                  </value>
+                </data>
+              </array>
+            </value>
+          </member>
+        </struct>
+      </value>
+    </param>
+  </params>
+</methodCall>
+
+The function fetch_plan_prices() is used to read current values of one pricing
+plan. The dfrom and dto arguments are used to select a range of dates.
+You use the rooms parameter (an array of integers, each one representing a
+room ID) if you are just interested on a particular set of rooms (otherwise,
+prices of all rooms are returned).
+
+The return value is a KV structure, very similar to the one used to modify
+prices (see  update_plan_prices())
+
+[[handling-intensive-plans-deprecated-do-not-implement]]
+
+Handling Intensive Plans (DEPRECATED, do NOT implement)
+
++ show/hide code
+[[hiddencodeblock28]]
+
+As already stated before, if possible do not develop Intensive Plans functions.
+Dealing with Daily Pricing Plans is easier and enough on the great part of cases.
+
+Anyway, to manage Intensive Pricing Plans you have the following functions:
+
+.. function:: convert_to_daily_plan(token, lcode, pid)
+.. function:: update_plan_periods(token, lcode, pid, periods)
+.. function:: delete_periods(token, lcode, pid, delperiods)
+
+The function **convert_to_daily_plan()** is used to transform an Intensive
+Pricing Plan to a Daily Pricing Plan. Very useful if you have existing
+Intensive Pricing Plan and you correctly want to manage only Daily Plans.
+
+The function **update_plan_periods()** is used to modify prices. As described
+on the introduction of this chapter, Intensive Pricing Plans define prices
+depending on the range of dates. Moreover, inside each range of dates, you
+can differentiate prices depending on the day of the week.
+
+.. warning::
+
+  Keep in mind you can send a maximum of 20 periods per call, 160 calls per hour.
+
+The **periods** argument is used to specify prices and range of dates. It is
+an array, each element containing a range of dates and relative prices. Each
+element is a KV structure containing three fields: **dfrom**, **dto** and
+**values**. The **values** key contains the prices and it's equal to the
+structure used for the function :func:`update_plan_rack`.
+That's an example:
+
+.. code-block:: python
+
+  periods= [
+    {
+      'dfrom': 21/10/2021',
+      'dto': 12/12/2021',
+      'values': {
+        '1': [1,2,3,4,5,6,7],
+        '2': [1,2,3,4,5,6,7],
+      }
+    },
+    {
+      'dfrom': 21/10/2080',
+      'dto': 12/12/2080',
+      'values': {
+        '1': [1,2,3,4,5,6,7],
+        '2': [1,2,3,4,5,6,7],
+      }
+    }
+  ]
+
+Now that you know how to define prices for particular ranges of dates, you can
+have the need to delete them (restoring that way the default prices of the
+pricing plan -rack-). To do that, one uses **delete_periods()**. This time,
+the argument **periods** is a list of KV structs which contains just ranges
+of dates, like that:
+
+.. code-block:: python
+
+  periods= [{'dfrom': '10/12/2020', 'dto': '20/12/2020'}, {'dfrom': '10/01/2040', 'dto': '20/01/2040'}]
+
+
+
+
+         Previous
+        Next
+
+
+
+
+
+
+© Copyright 2020, WuBook.
+
+
+
+  Built with Sphinx using a
+    theme
+    provided by Read the Docs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

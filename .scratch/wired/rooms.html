@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<meta content="Wired API, handling rooms" name="description" />
+<meta content="Wired, xml, api, channel manager, booking engine, rooms, room" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Handling Rooms &mdash; WuBook Technical Docs  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/rtd_custom_css.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/rtd_custom_js.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Wired: updating availability" href="avail.html" />
+    <link rel="prev" title="Wired Authentication" href="auth.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wubook_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../wired.html">Wired Api</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policies.html">Anti-abuse policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="certification.html">Certification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="return.html">Return values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html">Authentication</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Handling rooms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fetching-existing-rooms">Fetching existing rooms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fetch_rooms"><code class="docutils literal notranslate"><span class="pre">fetch_rooms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fetch_single_room"><code class="docutils literal notranslate"><span class="pre">fetch_single_room()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-a-new-room">Adding a new room</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#new_room"><code class="docutils literal notranslate"><span class="pre">new_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#new_virtual_room"><code class="docutils literal notranslate"><span class="pre">new_virtual_room()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#modifying-a-room">Modifying a room</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mod_room"><code class="docutils literal notranslate"><span class="pre">mod_room()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mod_virtual_room"><code class="docutils literal notranslate"><span class="pre">mod_virtual_room()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#removing-a-room">Removing a room</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#del_room"><code class="docutils literal notranslate"><span class="pre">del_room()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#other-functions">Other functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#room_images"><code class="docutils literal notranslate"><span class="pre">room_images()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#update-functions">Update Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#push_update_activation"><code class="docutils literal notranslate"><span class="pre">push_update_activation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#push_update_url"><code class="docutils literal notranslate"><span class="pre">push_update_url()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="avail.html">Updating availability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prices.html">Handling prices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rstrs.html">Handling restrictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fetch.html">Fetching reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rsrvs.html">Handling reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woodoo.html">Channel manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpolicies.html">Cancellation Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extras.html">Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html">Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corps.html">Corporate functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chainwidget.html">Chain Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webhooks.html">Webhooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="errormessages.html">Error codes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ord.html">Online Reception</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fount.html">Fount</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../woodooapi.html">WooDooApi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kapi.html">Zak API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WuBook Technical Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../wired.html">Wired</a></li>
+      <li class="breadcrumb-item active">Handling Rooms</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wired/rooms.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="handling-rooms">
+<h1>Handling Rooms<a class="headerlink" href="#handling-rooms" title="Permalink to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<p>This chapter is the right piece of documentation if you want to add, modify
+and remove rooms. There are two kind of rooms:</p>
+<ul class="simple">
+<li><p>Standard room</p></li>
+<li><p>Virtual rooms</p></li>
+</ul>
+<p>Virtual rooms are always associated to a Standard Room and inherit its
+availability. At the same time, they have indipendent restrictions and
+prices, occupancies and meal options (boards settings).</p>
+<p>Each room has a set of default values, which are globally applied (applied for
+each day of each year) until you override them depending on the dates.</p>
+<p>Rooms can be <strong>WooDoo Only</strong>: when a room is WooDoo Only, this room is
+not sold on the WooDoo Online Reception (booking engine).</p>
+<p>Finally, WuBook supports the <strong>Anchorage</strong> feature: the prices of one room
+can be inherited by another room and altered by a static or percentage
+variation.</p>
+</section>
+<section id="fetching-existing-rooms">
+<h2>Fetching existing rooms<a class="headerlink" href="#fetching-existing-rooms" title="Permalink to this heading"></a></h2>
+<p>To retrieve the rooms of one property, you can use one of the following functions:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fetch_rooms">
+<span class="sig-name descname"><span class="pre">fetch_rooms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fetch_rooms" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p><strong>fetch_rooms</strong> returns a list of rooms</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fetch_single_room">
+<span class="sig-name descname"><span class="pre">fetch_single_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fetch_single_room" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p><strong>fetch_single_room</strong> returns just the requested room.</p>
+<p>Rooms returned by these functions are represented by a Key-&gt;Value structure.
+Each structure having the following keys:</p>
+<ul class="simple">
+<li><p><strong>id</strong>: the id of the room (what else?)</p></li>
+<li><p><strong>name</strong>: the main name of the room.</p></li>
+<li><p><strong>shortname</strong>: the room shortname: unique (per property)</p></li>
+<li><p><strong>occupancy</strong>: the room occupancy</p></li>
+<li><p><strong>men</strong>: adults (note: adults + children = occupancy)</p></li>
+<li><p><strong>children</strong>: children (note: adults + children = occupancy)</p></li>
+<li><p><strong>subroom</strong>: if the room is virtual, this field is the id of the Parent Room (0 otherwise)</p></li>
+<li><p><strong>anchorate</strong>: price anchorage. The field contains the Parent Room (0 otherwise)</p></li>
+<li><p><strong>price</strong>: the default price for this room</p></li>
+<li><p><strong>availability</strong>: the default availability</p></li>
+<li><p><strong>board</strong>: the default board (WooDoo Online Reception only)</p></li>
+<li><p><strong>boards</strong>: other optional boards (WooDoo Online Reception only)</p></li>
+<li><p><strong>woodoo</strong>: is that room woodoo only? (not sellable on the booking engine and Fount (TripAdvisor, Trivago and so on))</p></li>
+<li><p><strong>dec_avail</strong>: availability to be decreased in Parent Room</p></li>
+<li><p><strong>min_price</strong>: the minimun price for this room (If passed, must be greater to or equal to 5. Otherwise defalt values is 0)</p></li>
+<li><p><strong>max_price</strong>: the maximun price for this room (If passed, must be greater to or equal to 5. Otherwise defalt values is 0)</p></li>
+<li><p><strong>rtype</strong>: rtype ID (room, apartment and so on)</p></li>
+<li><p><strong>rtype_name</strong>: rtype name (rtype human description)</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>if a room is virtual, sending availability is useless. The availability is inherited from
+its Parent Room</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>if a room has a price anchorage, updating prices is useless. Prices are inherited from its
+Parent Room</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>a room can at the same time be virtual and having a price anchorage. The Parent Room for its
+availability can be different from the Parent Room of its price.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>with ancillary = 1 will be returned also description and name of the room for each language
+(just if previously set)</p>
+</div>
+<p>Here is an example of a fetch rooms request followed by the answer.</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock2'))">+ show/hide code</a><br /><div id="hiddencodeblock2" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="nt">&lt;methodCall&gt;</span>
+<span class="w">    </span><span class="nt">&lt;methodName&gt;</span>fetch_rooms<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">    </span><span class="nt">&lt;params&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>1238200946.2025<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/params&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/methodCall&gt;</span>
+
+<span class="w">  </span><span class="nt">&lt;---------------response---------------&gt;</span>
+
+<span class="w">  </span><span class="nt">&lt;methodResponse&gt;</span>
+<span class="w">    </span><span class="nt">&lt;params&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;array&gt;&lt;data&gt;</span>
+
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;array&gt;&lt;data&gt;</span>
+
+<span class="w">                </span><span class="nt">&lt;value&gt;&lt;struct&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>name<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>Romeo<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>men<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>2<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>subroom<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>occupancy<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>2<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>id<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>shortname<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>Rom<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>children<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/struct&gt;&lt;/value&gt;</span>
+
+<span class="w">                </span><span class="nt">&lt;value&gt;&lt;struct&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>name<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>Romeo<span class="w"> </span>single<span class="w"> </span>usage<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>men<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>2<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>subroom<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>occupancy<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>id<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>2<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>shortname<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>rom1<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;name&gt;</span>children<span class="nt">&lt;/name&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/struct&gt;&lt;/value&gt;</span>
+
+<span class="w">              </span><span class="nt">&lt;/data&gt;&lt;/array&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/data&gt;&lt;/array&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/params&gt;</span>
+</pre></div>
+</div>
+</div></section>
+<section id="adding-a-new-room">
+<h2>Adding a new room<a class="headerlink" href="#adding-a-new-room" title="Permalink to this heading"></a></h2>
+<p>To add a room, you have two functions (depending on the nature of the room, standard or virtual):</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="new_room">
+<span class="sig-name descname"><span class="pre">new_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">woodoo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defprice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avail</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defboard</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_price</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#new_room" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="new_virtual_room">
+<span class="sig-name descname"><span class="pre">new_virtual_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">woodoo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defprice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defboard</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_avail</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_price</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#new_virtual_room" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>Both return the assigned ID of the new room. Let’s discuss the not trivial parameters:</p>
+<ul class="simple">
+<li><p><strong>woodoo:</strong> if 1, this room will be WooDoo only</p></li>
+<li><p><strong>shortame:</strong> maximum 4 chars. For the same property, use different shortnames for different rooms</p></li>
+<li><p><strong>defboard:</strong> it can be <em>bb</em> (breakfast), <em>fb</em> (full board), <em>hb</em> (half board), <em>nb</em> (no board) and <em>ai</em> (all inclusive)</p></li>
+<li><p><strong>names:</strong> used to provide a name of the room for each language (booking engine). KV struct, like: {‘en’: ‘Double’, ‘it’: ‘Doppia’}</p></li>
+<li><p><strong>descriptions</strong>: as <em>names</em></p></li>
+<li><p><strong>rtype:</strong> type of the product (1: Room; 2: Apartment; 3: Bed; 4: Unit; 5: Bungalow; 6: Tent; 7: Villa; 8: Chalet; 9: RV park)</p></li>
+<li><p><strong>boards:</strong> optional and only useful for the Online Reception (booking engine). Details follow.</p></li>
+<li><p><strong>beds:</strong> the occupancy of the rooms (children included)</p></li>
+<li><p><strong>children:</strong> the number of allowed children (if 1 and beds= 2, the occupancy is 1 Adult + 1 Child)</p></li>
+<li><p><strong>dec_avail</strong>: availability to be decreased in Parent Room</p></li>
+<li><p><strong>min_price</strong>: the minimun price for this room (If passed, must be greater to or equal to 5. Otherwise defalt values is 0)</p></li>
+<li><p><strong>max_price</strong>: the maximun price for this room (If passed, must be greater to or equal to 5. Otherwise defalt values is 0)</p></li>
+</ul>
+<p>Notice that in order to add a virtual room the <strong>rid</strong> argument is necessary: this is the
+identifier of the Parent Room.</p>
+<p>Before understanding the <strong>boards</strong> parameter as Data Type, let’s see how
+it works. First of all, this information is only used on the Booking
+engine. So, for example, if the room is <em>WooDoo Only</em>, this information is completely
+useless.</p>
+<p>The WooDoo Online Reception (booking engine) can propose different prices for the same
+room depending on the selected meal option (if multiple options are provided,
+otherwise, it’s always sold with the standard board).</p>
+<p>Providing multiple meal options is possible and can be done by defining a price
+variation. For example, a double, sold with a breakfast option by default,
+can be sold with an increase of 10 EUR when the Half Board option is selected.</p>
+<p>So, a meal option is a variation of the room price. And the variation can be static
+(+/- N EUR) or defined in percentage (+/- N%). The parameter defining the variation
+is called <strong>dtype</strong> and can assume the following values:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Value</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>Static increase</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>Percentage increase</p></td>
+</tr>
+<tr class="row-even"><td><p>-1</p></td>
+<td><p>Percentage decrease</p></td>
+</tr>
+<tr class="row-odd"><td><p>-2</p></td>
+<td><p>Static decrease</p></td>
+</tr>
+</tbody>
+</table>
+<p>This being said, let’s analyze the <strong>boards</strong> parameter. It is a complex KV struct,
+representing this logic. Let’s check an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">boards</span><span class="o">=</span> <span class="p">{</span><span class="s1">&#39;hb&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span> <span class="s1">&#39;fb&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>Suppose that, for the day X, the room price (related to the default
+meal option) is 100. With the previous example, the room sold with an
+Half Board option would cost 110 (percentage variation, <em>hb</em>). The same room,
+sold in Full Board option would cost instead 120 (static increase for <em>fb</em>).</p>
+<p>Let’s also report an xml representation of the previous KV struct:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">struct</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">member</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">hb</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">struct</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="n">member</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">dtype</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span>
+              <span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span><span class="mi">1</span><span class="o">&lt;/</span><span class="nb">int</span><span class="o">&gt;</span>
+            <span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+          <span class="o">&lt;/</span><span class="n">member</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="n">member</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">value</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span>
+              <span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span><span class="mi">10</span><span class="o">&lt;/</span><span class="nb">int</span><span class="o">&gt;</span>
+            <span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+          <span class="o">&lt;/</span><span class="n">member</span><span class="o">&gt;</span>
+        <span class="o">&lt;/</span><span class="n">struct</span><span class="o">&gt;</span>
+      <span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+    <span class="o">&lt;/</span><span class="n">member</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">member</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">fb</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">struct</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="n">member</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">dtype</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span>
+              <span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span><span class="mi">2</span><span class="o">&lt;/</span><span class="nb">int</span><span class="o">&gt;</span>
+            <span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+          <span class="o">&lt;/</span><span class="n">member</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="n">member</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">value</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span>
+              <span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span><span class="mi">20</span><span class="o">&lt;/</span><span class="nb">int</span><span class="o">&gt;</span>
+            <span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+          <span class="o">&lt;/</span><span class="n">member</span><span class="o">&gt;</span>
+        <span class="o">&lt;/</span><span class="n">struct</span><span class="o">&gt;</span>
+      <span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+    <span class="o">&lt;/</span><span class="n">member</span><span class="o">&gt;</span>
+  <span class="o">&lt;/</span><span class="n">struct</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Finally, let’s check a full <strong>new_room()</strong> example: click on the following link
+to review it!</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock3'))">+ show/hide code</a><br /><div id="hiddencodeblock3" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;methodCall&gt;</span>
+<span class="w">  </span><span class="nt">&lt;methodName&gt;</span>new_room<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;string&gt;</span>9516736649.5172<span class="nt">&lt;/string&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;string&gt;</span>NewRoom<span class="nt">&lt;/string&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>10<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>1000<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>1000<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;string&gt;</span>NeC<span class="nt">&lt;/string&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;string&gt;</span>nb<span class="nt">&lt;/string&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>ru<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;string&gt;</span>russian<span class="w"> </span>name<span class="nt">&lt;/string&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>ru<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;string&gt;</span>russian<span class="w"> </span>description<span class="nt">&lt;/string&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>bb<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>dtype<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>value<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;int&gt;</span>10<span class="nt">&lt;/int&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>3<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>120<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodCall&gt;</span>
+</pre></div>
+</div>
+</div><p>And here is an example of the answer.</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock4'))">+ show/hide code</a><br /><div id="hiddencodeblock4" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;array&gt;</span>
+<span class="w">          </span><span class="nt">&lt;data&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;int&gt;</span>1000<span class="nt">&lt;/int&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+</pre></div>
+</div>
+</div></section>
+<section id="modifying-a-room">
+<h2>Modifying a room<a class="headerlink" href="#modifying-a-room" title="Permalink to this heading"></a></h2>
+<p>As for adding new rooms, we have two available procedures to modify existing rooms:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mod_room">
+<span class="sig-name descname"><span class="pre">mod_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defprice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avail</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defboard</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">woodoo_only</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#mod_room" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>Below you’ll find an example of a request and a response.</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock5'))">+ show/hide code</a><br /><div id="hiddencodeblock5" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;methodCall&gt;</span>
+<span class="w">  </span><span class="nt">&lt;methodName&gt;</span>mod_room<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>9990289972.1552<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>24438<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>Double<span class="w"> </span>room<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>2<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;double&gt;</span>42.0<span class="nt">&lt;/double&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>5<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>DB<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>nb<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>it<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>Camera<span class="w"> </span>doppia<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>en<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>Description<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>room<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>hb<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>dtype<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>value<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>10<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>fb<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>dtype<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>2<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>value<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>20<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;double&gt;</span>10.0<span class="nt">&lt;/double&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;double&gt;</span>1000.0<span class="nt">&lt;/double&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodCall&gt;</span>
+
+<span class="cm">&lt;!----------------- answer -----------&gt;</span>
+<span class="nt">&lt;methodResponse&gt;</span>
+<span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;array&gt;</span>
+<span class="w">          </span><span class="nt">&lt;data&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>24438<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodResponse&gt;</span>
+</pre></div>
+</div>
+</div><dl class="py function">
+<dt class="sig sig-object py" id="mod_virtual_room">
+<span class="sig-name descname"><span class="pre">mod_virtual_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">children</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defprice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">short</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defboard</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_avail</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">woodoo_only</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#mod_virtual_room" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>To understand the meaning of the arguments, check the following example of a call followed by a response.</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock6'))">+ show/hide code</a><br /><div id="hiddencodeblock6" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="nt">&lt;methodCall&gt;</span>
+<span class="w">    </span><span class="nt">&lt;methodName&gt;</span>mod_virtual_room<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">    </span><span class="nt">&lt;params&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;string&gt;</span>1374667085.8467<span class="nt">&lt;/string&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>34668<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;string&gt;</span>Family<span class="nt">&lt;/string&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>3<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>80<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;string&gt;</span>MTRD<span class="nt">&lt;/string&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;string&gt;</span>hb<span class="nt">&lt;/string&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>120<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/params&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;-----------------answer-----------&gt;</span>
+<span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;array&gt;</span>
+<span class="w">          </span><span class="nt">&lt;data&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;int&gt;</span>34668<span class="nt">&lt;/int&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+</pre></div>
+</div>
+</div></section>
+<section id="removing-a-room">
+<h2>Removing a room<a class="headerlink" href="#removing-a-room" title="Permalink to this heading"></a></h2>
+<p>Deleting a room is very easy:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="del_room">
+<span class="sig-name descname"><span class="pre">del_room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#del_room" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>Here is an example of del_room() call followed by its answer.</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock7'))">+ show/hide code</a><br /><div id="hiddencodeblock7" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="nt">&lt;methodCall&gt;</span>
+<span class="w">    </span><span class="nt">&lt;methodName&gt;</span>del_room<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">    </span><span class="nt">&lt;params&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;string&gt;</span>9940098773.3035<span class="nt">&lt;/string&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>99318<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/methodCall&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;-----------------response---------&gt;</span>
+
+<span class="w">  </span><span class="nt">&lt;methodResponse&gt;</span>
+<span class="w">    </span><span class="nt">&lt;params&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;array&gt;</span>
+<span class="w">            </span><span class="nt">&lt;data&gt;</span>
+<span class="w">              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/params&gt;</span>
+</pre></div>
+</div>
+</div></section>
+<section id="other-functions">
+<h2>Other functions<a class="headerlink" href="#other-functions" title="Permalink to this heading"></a></h2>
+<p>The following functions can be useful:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="room_images">
+<span class="sig-name descname"><span class="pre">room_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token.</span> <span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#room_images" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p><strong>room_images()</strong> returns a list of images for the room identified by <em>rid</em>.
+Each image is a struct containing an url (<em>image_link</em>) and a flag <em>main_image</em> (1 or 0).
+When <em>main_image</em> is 1, that’s  the default image of the room (and other images should be considered additional).</p>
+<p>The following is an example of the room_images() call followed by the response.</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock8'))">+ show/hide code</a><br /><div id="hiddencodeblock8" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="nt">&lt;methodCall&gt;</span>
+<span class="w">    </span><span class="nt">&lt;methodName&gt;</span>room_images<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">    </span><span class="nt">&lt;params&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;string&gt;</span>1322234714.0089<span class="nt">&lt;/string&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;int&gt;</span>3069<span class="nt">&lt;/int&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/params&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/methodCall&gt;</span>
+
+<span class="w">  </span><span class="nt">&lt;-----------------------response-------------&gt;</span>
+
+<span class="w">  </span><span class="nt">&lt;methodResponse&gt;</span>
+<span class="w">    </span><span class="nt">&lt;params&gt;</span>
+<span class="w">      </span><span class="nt">&lt;param&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;array&gt;</span>
+<span class="w">            </span><span class="nt">&lt;data&gt;</span>
+<span class="w">               </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                 </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">               </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">               </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                 </span><span class="nt">&lt;array&gt;</span>
+<span class="w">                   </span><span class="nt">&lt;data&gt;</span>
+<span class="w">                     </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                       </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">                         </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                           </span><span class="nt">&lt;name&gt;</span>id_room<span class="nt">&lt;/name&gt;</span>
+<span class="w">                           </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                             </span><span class="nt">&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;</span>
+<span class="w">                           </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                         </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                         </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                           </span><span class="nt">&lt;name&gt;</span>image_link<span class="nt">&lt;/name&gt;</span>
+<span class="w">                           </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                             </span><span class="nt">&lt;string&gt;</span>https://wubook.net/wbk/imgs/room/3609.png<span class="nt">&lt;/string&gt;</span>
+<span class="w">                           </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                         </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                         </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                           </span><span class="nt">&lt;name&gt;</span>main_image<span class="nt">&lt;/name&gt;</span>
+<span class="w">                           </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                             </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">                           </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                         </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                       </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">                     </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                   </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">                 </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">               </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/params&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/methodResponse&gt;</span>
+</pre></div>
+</div>
+</div></section>
+<section id="update-functions">
+<h2>Update Functions<a class="headerlink" href="#update-functions" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="push_update_activation">
+<span class="sig-name descname"><span class="pre">push_update_activation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#push_update_activation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>Wired can send a notification if rooms values are changed, for instance when a user updates the availability of his rooms on WooDoo Extranet.
+The <strong>push_update_activation()</strong> method is used to setup an URL to which the notifications will be sent.
+A notification is very simple, it’s just a POST with three parameters: lcode, dfrom, dto. By default, the URL configured for Update
+Notifications is empty and it means that no notification will be sent. By setting up a right URL, notifications <strong>will</strong> be sent.
+To <strong>disable</strong> the Update Notification System, just use url= “” (empty string).</p>
+<p>This function is very important if you use Wired to develop your own Booking Engine. It allows to set a reliable cache system on your side.
+The logic behind it is: you periodically <strong>download</strong> rooms values by using Wired functions (like fetch_rooms_values() and plans functions) and then, when
+you receive a PushUpdate notification, you know that your data must be refreshed for a specified range of dates.</p>
+<p>Here is an example of a request and an answer:</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock9'))">+ show/hide code</a><br /><div id="hiddencodeblock9" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;methodCall&gt;</span>
+<span class="nt">&lt;methodName&gt;</span>push_update_activation<span class="nt">&lt;/methodName&gt;</span>
+<span class="nt">&lt;params&gt;</span>
+<span class="nt">&lt;param&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;string&gt;</span>9222557560.2196<span class="nt">&lt;/string&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/param&gt;</span>
+<span class="nt">&lt;param&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/param&gt;</span>
+<span class="nt">&lt;param&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;string&gt;</span>http://wikipedia.com<span class="nt">&lt;/string&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/param&gt;</span>
+<span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodCall&gt;</span>
+
+<span class="nt">&lt;methodResponse&gt;</span>
+<span class="nt">&lt;params&gt;</span>
+<span class="nt">&lt;param&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;array&gt;</span>
+<span class="nt">&lt;data&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;string&gt;</span>Ok<span class="nt">&lt;/string&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/data&gt;</span>
+<span class="nt">&lt;/array&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/param&gt;</span>
+<span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodResponse&gt;</span>
+</pre></div>
+</div>
+</div><dl class="py function">
+<dt class="sig sig-object py" id="push_update_url">
+<span class="sig-name descname"><span class="pre">push_update_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#push_update_url" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>While the previous function allows to set the url, this one simply <strong>returns the url</strong> used of that lcode.</p>
+<p>Here is an example of a request and an answer:</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock10'))">+ show/hide code</a><br /><div id="hiddencodeblock10" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;methodCall&gt;</span>
+<span class="nt">&lt;methodName&gt;</span>push_update_url<span class="nt">&lt;/methodName&gt;</span>
+<span class="nt">&lt;params&gt;</span>
+<span class="nt">&lt;param&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;string&gt;</span>9222557560.2196<span class="nt">&lt;/string&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/param&gt;</span>
+<span class="nt">&lt;param&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/param&gt;</span>
+<span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodCall&gt;</span>
+
+
+<span class="nt">&lt;methodResponse&gt;</span>
+<span class="nt">&lt;params&gt;</span>
+<span class="nt">&lt;param&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;array&gt;</span>
+<span class="nt">&lt;data&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;value&gt;</span>
+<span class="nt">&lt;string&gt;</span>http://wikipedia.com<span class="nt">&lt;/string&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/data&gt;</span>
+<span class="nt">&lt;/array&gt;</span>
+<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/param&gt;</span>
+<span class="nt">&lt;/params&gt;</span>
+</pre></div>
+</div>
+</div></section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="auth.html" class="btn btn-neutral float-left" title="Wired Authentication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="avail.html" class="btn btn-neutral float-right" title="Wired: updating availability" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, WuBook.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+<!--<div style="margin-left:620px">-->
+<!--<a style="color:red" href="http://en.wubook.net">WuBook Website</a> -->
+<!--<style>-->
+<!--.descname {-->
+        <!--color: #E69138;-->
+        <!--}-->
+        <!--div.note {-->
+                <!--background-color: #ddffd1;-->
+                <!--}-->
+                <!--.sphinxsidebarwrapper_zzz {-->
+                        <!--border-right: 1px solid #999999;-->
+                        <!--}-->
+                        <!--h1 {-->
+                                <!--font-size: 180% !important;-->
+                                <!--color: #db0000 !important;-->
+                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                <!--}-->
+                                <!--h2 {-->
+                                        <!--font-size: 160% !important;-->
+                                        <!--color: #db0000 !important;-->
+                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                        <!--}-->
+                                        <!--p {-->
+                                                <!--font-size: 110% !important;-->
+                                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                <!--color: #3E4349-->
+                                                <!--}-->
+                                                <!--div.body {-->
+                                                        <!--font-size: 110% !important;-->
+                                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                        <!--color: #3E4349-->
+                                                        <!--}-->
+                                                        <!--</style>-->
+<!--</div>-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-4959530-27', 'auto');
+    ga('set', 'anonymizeIp', true);
+    ga('send', 'pageview');
+</script>
+   
+
+
+</body>
+</html>
