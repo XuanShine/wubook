@@ -8,7 +8,7 @@ import xmlrpc.client
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from typing import Protocol
+from typing import Mapping, Protocol
 
 from booking.model import (
     ArrivalDay,
@@ -133,8 +133,33 @@ class Ledger(Protocol):
         ...
 
 
+@dataclass(frozen=True)
+class StayFacts:
+    cells_by_room: Mapping[RoomId, tuple[NightCell, ...]]
+    cents_by_room: Mapping[RoomId, tuple[Cents | None, ...]]
+
+
+@dataclass(frozen=True)
+class BookableRoom:
+    id: RoomId
+    name: str
+    occupancy: int
+    nights: int
+    total_cents: Cents
+    quantity: int
+
+
+@dataclass(frozen=True)
+class Board:
+    rooms: tuple[BookableRoom, ...]
+    block: Refusal | None
+
+
 class Wire(Protocol):
     def rooms(self) -> dict[RoomId, Room]:
+        ...
+
+    def stay_facts(self, stay: Stay) -> StayFacts:
         ...
 
     def room_stay(self, stay: Stay, room: Room) -> RoomStay:
@@ -508,10 +533,14 @@ class XmlRpcWire:
     def rooms(self) -> dict[RoomId, Room]:
         return parse_catalog(self._invoke("fetch_rooms", ()))
 
-    def room_stay(self, stay: Stay, room: Room) -> RoomStay:
+    def stay_facts(self, stay: Stay) -> StayFacts:
         values = self._invoke("fetch_rooms_values", _values_args(values_window(stay)))
         prices = self._invoke("fetch_plan_prices", _price_args(price_window(stay)))
-        return assemble(stay, room, parse_values(values, stay), parse_prices(prices, stay))
+        return StayFacts(parse_values(values, stay), parse_prices(prices, stay))
+
+    def room_stay(self, stay: Stay, room: Room) -> RoomStay:
+        facts = self.stay_facts(stay)
+        return assemble(stay, room, facts.cells_by_room, facts.cents_by_room)
 
     def book(
         self,
@@ -608,6 +637,37 @@ class Counter:
         if room is None:
             return UnknownRoom(room_id)
         return quote(stay, room, self._wire.room_stay(stay, room))
+
+    def bookable_rooms(self, stay: Stay, today: date) -> Board | PastArrival | TooLong:
+        early = past_arrival(stay, today)
+        if early is not None:
+            return early
+        late = too_long(stay)
+        if late is not None:
+            return late
+        catalog = self._wire.rooms()
+        facts = self._wire.stay_facts(stay)
+        offered: list[BookableRoom] = []
+        refusals: list[Refusal] = []
+        for room in catalog.values():
+            result = quote(stay, room, assemble(stay, room, facts.cells_by_room, facts.cents_by_room))
+            if isinstance(result, Offer):
+                offered.append(
+                    BookableRoom(
+                        room.id,
+                        room.name,
+                        room.occupancy,
+                        result.nights,
+                        result.total_cents,
+                        result.quantity,
+                    )
+                )
+            else:
+                refusals.append(result)
+        block: Refusal | None = None
+        if not offered and refusals and all(item == refusals[0] for item in refusals):
+            block = refusals[0]
+        return Board(tuple(offered), block)
 
     def reserve(
         self,
