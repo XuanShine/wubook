@@ -1,0 +1,12 @@
+- id: petit_dejeuner
+  label: Petit-déjeuner
+  cents: 1400
+  per: person_night
+- id: parking
+  label: Parking
+  cents: 1500
+  per: stay
+- id: lit_bebe
+  label: Lit bébé
+  cents: 1000
+  per: stay
