@@ -52,6 +52,7 @@ from booking.service import (
 _EXTRAS_PATH = Path(__file__).resolve().parent / "extras.yml"
 _ROOMS_PATH = Path(__file__).resolve().parent.parent / "room_config.yml"
 _HOUR = re.compile(r"^(?:[01]\d|2[0-3]):[0-5]\d$")
+_HOUR_WITH_SECONDS = re.compile(r"^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$")
 _IGNORED = {"amount", "total_cents", "currency"}
 _NONE_BOOKABLE = "Aucune chambre n'est réservable pour ces dates."
 _IN_FLIGHT = "Votre demande est déjà en cours. Aucune seconde réservation ne sera créée."
@@ -664,11 +665,11 @@ def _contact_errors(draft: ContactDraft) -> tuple[tuple[str, str], ...]:
     local, mark, domain = email.partition("@")
     if mark != "@" or local == "" or "@" in domain or "." not in domain:
         errors.append(("email", "Indiquez un e-mail valide."))
-    phone = draft.phone.strip()
+    phone = _phone(draft.phone)
     digits = phone[1:] if phone.startswith("+") else phone
     if not digits.isdecimal() or not 8 <= len(digits) <= 15:
         errors.append(("phone", "Indiquez un téléphone de 8 à 15 chiffres."))
-    if _HOUR.fullmatch(draft.arrival_hour.strip()) is None:
+    if _arrival(draft.arrival_hour) is None:
         errors.append(("arrival_hour", "Indiquez une heure d'arrivée."))
     if len(draft.remarks) > 500:
         errors.append(("remarks", "Les remarques tiennent en 500 caractères."))
@@ -680,10 +681,28 @@ def _clean_draft(draft: ContactDraft) -> ContactDraft:
         draft.last_name.strip(),
         draft.first_name.strip(),
         draft.email.strip(),
-        draft.phone.strip(),
-        draft.arrival_hour.strip(),
+        _phone(draft.phone),
+        _arrival(draft.arrival_hour) or draft.arrival_hour.strip(),
         draft.remarks.strip(),
     )
+
+
+def _phone(text: str) -> str:
+    stripped = text.strip()
+    plus = stripped.startswith("+")
+    digits = "".join(ch for ch in stripped if ch.isdecimal())
+    if plus:
+        return f"+{digits}"
+    return digits
+
+
+def _arrival(text: str) -> str | None:
+    stripped = text.strip()
+    if _HOUR.fullmatch(stripped):
+        return stripped
+    if _HOUR_WITH_SECONDS.fullmatch(stripped):
+        return stripped[:5]
+    return None
 
 
 def _day(text: str) -> date | None:

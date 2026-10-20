@@ -334,6 +334,20 @@ def test_contact_rules_stop_before_reserve(tmp_path: Path, field: str, value: st
     assert proxy.calls == []
 
 
+def test_spaced_phone_and_seconds_are_stored_clean(tmp_path: Path) -> None:
+    proxy = FakeProxy()
+    shown = step(
+        counter(tmp_path, proxy),
+        contact_fields(phone="+33 6 12 34 56 78", arrival_hour="18:00:00"),
+        TODAY,
+    )
+
+    assert isinstance(shown, Blocked)
+    assert shown.draft.phone == "+33612345678"
+    assert shown.draft.arrival_hour == "18:00"
+    assert methods(proxy, "new_reservation") == []
+
+
 def test_empty_key_does_not_reserve(tmp_path: Path) -> None:
     proxy = FakeProxy()
     shown = step(counter(tmp_path, proxy), contact_fields(key=""), TODAY)
