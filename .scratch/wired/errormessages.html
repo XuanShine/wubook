@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<meta content="Wired API, error messages" name="description" />
+<meta content="Wired, xml, api, error" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Error Messages &mdash; WuBook Technical Docs  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/rtd_custom_css.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/rtd_custom_js.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Online Reception" href="../ord.html" />
+    <link rel="prev" title="Wired API Webhooks" href="webhooks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wubook_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../wired.html">Wired Api</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policies.html">Anti-abuse policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="certification.html">Certification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="return.html">Return values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rooms.html">Handling rooms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="avail.html">Updating availability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prices.html">Handling prices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rstrs.html">Handling restrictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fetch.html">Fetching reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rsrvs.html">Handling reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woodoo.html">Channel manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpolicies.html">Cancellation Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extras.html">Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html">Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corps.html">Corporate functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chainwidget.html">Chain Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webhooks.html">Webhooks</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Error codes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ord.html">Online Reception</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fount.html">Fount</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../woodooapi.html">WooDooApi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kapi.html">Zak API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WuBook Technical Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../wired.html">Wired</a></li>
+      <li class="breadcrumb-item active">Error Messages</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wired/errormessages.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="error-messages">
+<h1>Error Messages<a class="headerlink" href="#error-messages" title="Permalink to this heading"></a></h1>
+<p>When ReturnCode is less than zero, something wrong happened.
+In that case, info is a string and contains a Human Readable Error: this way you can better understand what happened.</p>
+<p>The list of errors with some actions to solve them:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Code</strong></p></th>
+<th class="head"><p><strong>Readable Error</strong></p></th>
+<th class="head"><p><strong>Action</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-1</p></td>
+<td><p>Authentication Failed</p></td>
+<td><p>Please check Permanent token and Lcode. See this: <a class="reference external" href="https://tdocs.wubook.net/wired/auth.html">AUTH</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>-7</p></td>
+<td><p>Internal Error</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Channel can not be initialized. If the problem persists, please, contact us</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Error saving parsed information</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid balance_id(s)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Payment failed. Please, double check your credit card</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Not able to cancel booking earlier than 1 day after the check in</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Property can mark reservation as “no show” for up to 48 hours</div>
+<div class="line">beginning at 00:00 on the day after the check-in.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Not able to cancel booking later than 2 days after the check in</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Property can mark reservation as “no show” for up to 48 hours</div>
+<div class="line">beginning at 00:00 on the day after the check-in.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>The reservation checkin date has passed. Can not proceed</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>-9</p></td>
+<td><p>Invalid Rooms for the selected property</p></td>
+<td><p>Please check roomID available from the URL of each room. <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Virtual room’s father cannot be a virtual room!</p></td>
+<td><p>You can only have a virtual room of a father room, not from an other virtual room</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid room ID(s)</p></td>
+<td><p>Please check roomID available from the URL of each room. <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Rooms not specified (or badly specified)</p></td>
+<td><p>Rooms must be specified using a KV structure</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">-10</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Invalid lcode.</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Given lcode is not associated with the token used to call the function</div>
+<div class="line"><br /></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>-11</p></td>
+<td><p>Shortname has to be unique. This shortname is already used</p></td>
+<td><p>A room short name has to be unique and at most 4 characters long</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Shortname: max 4 chars please</p></td>
+<td><p>A room short name has to be unique and at most 4 characters long</p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">-12</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Room Not Deleted: Special Offer Mapped Channels Anchorate or Packages are Involved</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">If a room is in use in a channel (associated to an OTA room) or in use in aspecial offer</div>
+<div class="line">(see this: <a class="reference external" href="https://wubook.net/wod/ord/promos/">PROMOS</a>) then you can not delete it</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>-13</p></td>
+<td><p>Wrong call: pass right arguments please</p></td>
+<td><p>Please check the documentation here: <a class="reference external" href="https://tdocs.wubook.net/wired/cpolicies.html">CPOLICIES</a></p></td>
+</tr>
+<tr class="row-even"><td><p>-15</p></td>
+<td><p>This plan is actually in use</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>-17</p></td>
+<td><p>No CC for this reservation</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>-18</p></td>
+<td><p>Flooding detected: more than 21000 daily updates on the same request</p></td>
+<td><p>Please check limits here: <a class="reference external" href="https://tdocs.wubook.net/wired/policies.html">POLICIES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Error: More than 1000 days updated for room on the same request</p></td>
+<td><p>Please check limits here: <a class="reference external" href="https://tdocs.wubook.net/wired/policies.html">POLICIES</a></p></td>
+</tr>
+<tr class="row-even"><td><p>-19</p></td>
+<td><p>Invalid date: past date</p></td>
+<td><p>You can not update dates of the past..</p></td>
+</tr>
+<tr class="row-odd"><td><p>-20</p></td>
+<td><p>Dynamic human readable error</p></td>
+<td><p>Please check limits here: <a class="reference external" href="https://tdocs.wubook.net/wired/policies.html">POLICIES</a></p></td>
+</tr>
+<tr class="row-even"><td><p>-21</p></td>
+<td><p>Dynamic message</p></td>
+<td><p>Please check limits here: <a class="reference external" href="https://tdocs.wubook.net/wired/policies.html">POLICIES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>too many concurrent calls for the same property</p></td>
+<td><p>Be sure to run conflicting calls in sequence, or decrease the amount of
+data sent so that the queue can be processed faster with no timeouts</p></td>
+</tr>
+<tr class="row-even"><td><p>-22</p></td>
+<td><p>Invalid account type for this operation</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">-23</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">More than 20 periods on the same update_plan_values()</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Warning : Keep in mind you can send a maximum of 20 periods per call, 160 calls per hour.</div>
+<div class="line">See this: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">-24</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">limit is reached each property can contain max 80 rooms types.</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please divide the different rooms in different properties in order not ro reach limit of 80</div>
+<div class="line">(extensible to 100 on request)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">-25</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Rooms not available</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please check possible causes: no availability present in</div>
+<div class="line">Tabla / option “woodoo only” active in room definition.</div>
+<div class="line">See this: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>-26</p></td>
+<td><p>Master Policy cannot be deleted</p></td>
+<td><p>The Master policy present by default can be edited but not deleted</p></td>
+</tr>
+<tr class="row-odd"><td><p>-27</p></td>
+<td><p>Opportunity not deleted: is part of a soffer</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/extras.html">EXTRAS</a></p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">-28</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Invalid Policy Id</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please check the Policy ID present in URL (click on policy name)</div>
+<div class="line">See this: <a class="reference external" href="https://wubook.net/wod/ord/basic/plcs/">PLCS</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">-29</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Invalid Plan Id</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please check the Rate ID present in URL (click on Rate name).</div>
+<div class="line">See this: <a class="reference external" href="https://wubook.net/rates/plans/">PLANS</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>-30</p></td>
+<td><p>If you specify a Plan Id for the discount apply_to must be *</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/extras.html">EXTRAS</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>-31</p></td>
+<td><p>Invalid Guarantee specification</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/extras.html">EXTRAS</a></p></td>
+</tr>
+<tr class="row-even"><td><p>-32</p></td>
+<td><p>Invalid week days or type</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/extras.html">EXTRAS</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>-33</p></td>
+<td><p>Invalid requirements (Min/Max Advance Min/Max Stay): at least one is required</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/extras.html">EXTRAS</a></p></td>
+</tr>
+<tr class="row-even"><td><p>-34</p></td>
+<td><p>Invalid Must Rooms/Opps (malformed id lists) or Must Options (1=All selected rooms/opps 2=At least one)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/extras.html">EXTRAS</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>-35</p></td>
+<td><p>Invalid Opportunity/ies for the selected property</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/extras.html">EXTRAS</a></p></td>
+</tr>
+<tr class="row-even"><td><p>-36</p></td>
+<td><p>Invalid Country Codes</p></td>
+<td><p>Please check 2 letters country code here: <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes">COUNTRYCODES</a></p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">-37</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Invalid Special Offer Id</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please check the Special offer ID present in URL (click</div>
+<div class="line">on offer name). See this: <a class="reference external" href="https://wubook.net/wod/ord/promos/">PROMOS</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>-50</p></td>
+<td><p>Cannot proceed</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>-51</p></td>
+<td><p>The specified property can’t be removed. There are confirmed bookings, you need to wait for checkout</p></td>
+<td><p>Wait for the bookings’ checkout or cancel the confirmed bookings</p></td>
+</tr>
+<tr class="row-even"><td><p>-52</p></td>
+<td><p>The specified property can’t be removed. There are services waiting for a payment</p></td>
+<td><p>Please check transaction id from the corporate area (<a class="reference external" href="https://wubook.net/wauth/wauth/dash/corporate/?s=customers">CORPORATE_AREA</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>-53</p></td>
+<td><p>The specified property can’t be removed. There are services costs not yet claimable</p></td>
+<td><p>Please check transaction id from the corporate area (<a class="reference external" href="https://wubook.net/wauth/wauth/dash/corporate/?s=customers">CORPORATE_AREA</a>)</p></td>
+</tr>
+<tr class="row-even"><td><p>-54</p></td>
+<td><p>The specified property can’t be removed. An account must have at least one property</p></td>
+<td><p>You can use corporate_destroy_subaccount to remove the account</p></td>
+</tr>
+<tr class="row-odd"><td><p>-100</p></td>
+<td><p>Invalid Input</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid channel id</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid Expedia hotel ID</p></td>
+<td><p>Please check the Expedia Hotel ID from Expedia extranet</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>The Expedia room ID * is not valid</p></td>
+<td><p>Please check the Expedia Rooml ID from Expedia extranet</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Rooms mapping must be complete</p></td>
+<td><p>All Expedia have to be mapped. (with a different WuBook room)</p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Do not associate twice the same wubook room</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">You can not use twice the same WuBook room.</div>
+<div class="line">Please create an other (virtual) room type to be able to map.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>The Expedia room ID * is not valid</p></td>
+<td><p>Please check the Expedia Rooml ID from Expedia extranet</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Rooms mapping must be complete</p></td>
+<td><p>All Expedia have to be mapped. (with a different WuBook room)</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Do not associate twice the same wubook room</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">You can not use twice the same WuBook room.</div>
+<div class="line">Please create an other (virtual) room type to be able to map</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>The Expedia room ID * is not valid</p></td>
+<td><p>Please check the Expedia Rooml ID from Expedia extranet</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>The wubook room IDs are not valid</p></td>
+<td><p>Please check roomID available from the URL of each room. <a class="reference external" href="https://wubook.net/rates/rooms/">RATES</a></p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">The specified mapping is not valid</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please check Expedia and WuBook Room IDs.</div>
+<div class="line">All Expedia have to be mapped.</div>
+<div class="line">You can not use twice the same WuBook room.</div>
+<div class="line">Please create an other (virtual) room type to be able to map</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Mapping is not possible, channel must be initialized</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>The specified “hct” value must be boolean</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>The specified mstay_error_behaviour is not valid</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>The specified “last_rate” name is not among collected Expedia rate names (check “exp_rooms_rates”)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>The specified “mstay_type” is not valid</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Mapping is not possible, channel must be initialized</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>The Expedia rate ID * is not valid</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid Plans/Rplans ID(s)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid b.com hotel ID</p></td>
+<td><p>Please check Booking.com hotel ID from the extranet of Booking.com</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>For the specified channel, confirmation is not required</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Mapping is not possible, this channel must be enabled</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Mapping is not possible, this channel uses the LOS model.</div>
+<div class="line">The LOS model is currently not supporeted via Wired</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please contact the account manager of Booking.com to change</div>
+<div class="line">the model “Lenght Of Stay” for a compatible model (daily price)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>The b.com room ID * is not valid</p></td>
+<td><p>Please check roomID from Booking extranet</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Rooms mapping must be complete</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Do not associate twice the same wubook room</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">You can not use twice the same WuBook room.</div>
+<div class="line">Please create an other (virtual) room type to be able to map</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">The wubook room IDs are not valid</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please check roomID available from the URL of each room.</div>
+<div class="line">See this: <a class="reference external" href="https://wubook.net/rates/rooms/">RATES</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid reservation code</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid reservation code (reservation already cancelled)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid reservation code (no CC for this reservation)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid reservation code (reservation already marked that way)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Channel seems currently disconnected, Please check from B.com extranet in section “channel manager”</p></td>
+<td><p>Please also check if channel is active. See this: <a class="reference external" href="https://wubook.net/woodoo/channels/">CHANNELS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid tag (256 max length)</p></td>
+<td><p>Tag should be shorter than 256 characters</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Invalid channel type</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">The specified ID doesn’t match with any WooDoo channel IDs.</div>
+<div class="line">Please check the channel ID present in URL here: <a class="reference external" href="https://wubook.net/woodoo/channels/">CHANNELS</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid rcode</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/fetch.html">FETCH</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid status</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/fetch.html">FETCH</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid reservations: please, specify an array of reservation  (an empty array to mark all reservations)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/fetch.html">FETCH</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid language identifier (specify languages as <cite>en</cite>, <cite>fr</cite>, <cite>it</cite>, <cite>ru</cite> and so on)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid board identifier (boards:  )</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid dtype: (specify one of -2, 1, 1, 2)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please specify a greater then zero default price.</div>
+<div class="line">If in doubt, use the maximum price of the room, which is the safest choice</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></div>
+<div class="line"><br /></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid default board</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Max Price too low, must be greater than or equal to 5</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Both min and max price need to be greater than 5.</div>
+<div class="line">Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Min/Max price range incosistent (min &gt; max)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Wrong rtype field</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid descriptions</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>No rooms specified</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>URL is not valid (remember to use the right protocol, like <a class="reference external" href="http://foo.com">http://foo.com</a> or <a class="reference external" href="https://foo.com">https://foo.com</a>)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/fetch.html">FETCH</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Push Url test failed. Please, double check your server before to setup your url</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/fetch.html">FETCH</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid Plan Id</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid dates</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid plan</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid dates (too far in the past or too far in the future)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>No prices specified</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid prices</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid Plan ID (use zero for wubook parity)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid Plan ID (it does not belong to the specified property)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">The WuBook Parity rate is currently linked against an Intensive Plan:</div>
+<div class="line">you must use Intensive Plan Calls to modify it</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></div>
+<div class="line"><br /></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Make sure the specified pricing plan is Daily</p></td>
+<td><p>Please check further information here <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid plan name</p></td>
+<td><p>Please check further information from <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>The specified plan id does not identify an intensive plan for the property *</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid rooms</p></td>
+<td><p>Please check the room code: fetch_rooms (<a class="reference external" href="https://tdocs.wubook.net/wired/rooms.html">ROOMS</a>)</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid rplan id</p></td>
+<td><p>Please check the rate ID: get_pricing_plans (<a class="reference external" href="https://tdocs.wubook.net/wired/prices.html">PRICES</a>)</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid rules or rplan id</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid start date</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid rooms structure</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid rplan id or not daily rplan</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Please, send homegenous data: for each room, specify an equal number of days (days can be empty)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Parsing problem</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>No data sent</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Error finalizing operations</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Too many restriction plans selected LIMIT: * rplans</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Too large range of dates</p></td>
+<td><p>Range has to be at most 2 years. Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/rstrs.html?highlight=rplan_update_rplan_rules">RESTRICTIONS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid chan type</p></td>
+<td><p>Please check further information here <a class="reference external" href="https://tdocs.wubook.net/wired/woodoo.html">WOODOO</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid reservation code</p></td>
+<td><p>Please check the reservation code here: <a class="reference external" href="https://wubook.net/wod/bookings/bookings/">BOOKINGS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid reason</p></td>
+<td><p>Please check further information here <a class="reference external" href="https://tdocs.wubook.net/wired/rsrvs.html">RESERVATIONS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid reservation (unexistent or already confirmed)</p></td>
+<td><p>Please check further information here <a class="reference external" href="https://tdocs.wubook.net/wired/rsrvs.html">RESERVATIONS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid reservation: it’s not possible to reconfirm OTA reservations</p></td>
+<td><p>Please check further information here <a class="reference external" href="https://tdocs.wubook.net/wired/rsrvs.html">RESERVATIONS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Reservation is not reconfirmable</p></td>
+<td><p>Please check further information here <a class="reference external" href="https://tdocs.wubook.net/wired/rsrvs.html">RESERVATIONS</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Reservation is not confirmable</p></td>
+<td><p>Please check further information here <a class="reference external" href="https://tdocs.wubook.net/wired/rsrvs.html">RESERVATIONS</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid channels</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/corps.html">CORPORATES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Specify a positive number of months</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/corps.html">CORPORATES</a></p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">The woodoo_only model is gone.</div>
+<div class="line">For backward compatibility the woodoo_only param is still accepted.</div>
+<div class="line">However, be sure to pass a false value like 0 for it</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/corps.html">CORPORATES</a></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid email/emails</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/corps.html">CORPORATES</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid account code</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/corps.html">CORPORATES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid email</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/corps.html">CORPORATES</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Invalid lang (possible langs: …)</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/corps.html">CORPORATES</a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid account fields</p></td>
+<td><p>Please check further information here: <a class="reference external" href="https://tdocs.wubook.net/wired/corps.html">CORPORATES</a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>CC System is already enabled</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>No sufficient credit</p></td>
+<td><p>Please check your credit <a class="reference external" href="https://wubook.net/wauth/wauth/dash/security/?s=ccard">SECURITY_AREA</a></p></td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Make sure to use a correct and old password</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Note: the CC password is the one set here: <a class="reference external" href="https://wubook.net/wauth/wauth/dash/security/?s=ccard">SECURITY_AREA</a></div>
+<div class="line">(different than Wb account password)</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Invalid transaction id</p></td>
+<td><p>Please check transaction id from the corporate area (<a class="reference external" href="https://wubook.net/wauth/wauth/dash/corporate/?s=customers">CORPORATE_AREA</a>)</p></td>
+</tr>
+<tr class="row-even"><td><p>-101</p></td>
+<td><p>Malformed dates or restrictions unrespected</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Range is too great, select a smaller period please</p></td>
+<td><p>Range has to be at most 2 years</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Not so far in the future please. Beginning date in the next two years please</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Not so far in the future please. 5 years max.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p>Used dates are too far in the future. Maybe you want to use Default Values for future days</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p>Not so far in the future please. 3 years max</p></td>
+<td><p>You can not update dates further than 3 years</p></td>
+</tr>
+<tr class="row-even"><td><p>-102</p></td>
+<td><p>Malformed request inexistent function or wrong function arguments</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">-103</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Trying to update a Daily Plan with an Intensive Plan call.</div>
+<div class="line">Check documentation for the right call for Daily Plans</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">-104</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Trying to update an Intensive Plan with a Daily Plan call.</div>
+<div class="line">Check documentation for the right call for Intensive Plans</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>-1004</p></td>
+<td><p>Invalid Customer Data</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>-1005</p></td>
+<td><p>Invalid Credit Card Data or Credit Card Rejected</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>-1008</p></td>
+<td><p>Invalid alien code</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>-1009</p></td>
+<td><p>Amount Argument Wrong</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>-1010</p></td>
+<td><p>Origin Field Not Setted</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>-1011</p></td>
+<td><p>Invalid board</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>-1012</p></td>
+<td><p>Invalid Guests number</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="webhooks.html" class="btn btn-neutral float-left" title="Wired API Webhooks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../ord.html" class="btn btn-neutral float-right" title="Online Reception" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, WuBook.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+<!--<div style="margin-left:620px">-->
+<!--<a style="color:red" href="http://en.wubook.net">WuBook Website</a> -->
+<!--<style>-->
+<!--.descname {-->
+        <!--color: #E69138;-->
+        <!--}-->
+        <!--div.note {-->
+                <!--background-color: #ddffd1;-->
+                <!--}-->
+                <!--.sphinxsidebarwrapper_zzz {-->
+                        <!--border-right: 1px solid #999999;-->
+                        <!--}-->
+                        <!--h1 {-->
+                                <!--font-size: 180% !important;-->
+                                <!--color: #db0000 !important;-->
+                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                <!--}-->
+                                <!--h2 {-->
+                                        <!--font-size: 160% !important;-->
+                                        <!--color: #db0000 !important;-->
+                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                        <!--}-->
+                                        <!--p {-->
+                                                <!--font-size: 110% !important;-->
+                                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                <!--color: #3E4349-->
+                                                <!--}-->
+                                                <!--div.body {-->
+                                                        <!--font-size: 110% !important;-->
+                                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                        <!--color: #3E4349-->
+                                                        <!--}-->
+                                                        <!--</style>-->
+<!--</div>-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-4959530-27', 'auto');
+    ga('set', 'anonymizeIp', true);
+    ga('send', 'pageview');
+</script>
+   
+
+
+</body>
+</html>

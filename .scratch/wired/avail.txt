@@ -1,0 +1,470 @@
+
+
+
+
+[[wired-updating-availability]]
+
+Wired: updating availability
+
+[[introduction]]
+
+Introduction
+
+Let’s begin with a simple consideration: WooDoo availability is
+room oriented, meaning that each room has its own availability.
+Altough this option is the most common, it’s better to explicitely
+specify it. For some OTAs, in fact, the availability is rate oriented
+(this means that having 3 rooms and 2 rates, you have 6 availability
+contingents to manage).
+
+There are two availability parameters:
+
+Availability: often referred as avail, this is the availability of one room
+
+No Ota: when activated, wubook sends zero availability to the connected OTAs, even when the availability is positive. This is mainly used to sell, at least for a range of dates, a particular room only on the WooDoo Online Reception (booking engine), closing the sales on third channels
+
+[[updating-availability]]
+
+Updating availability
+
+The functions to manage the two availability parameters for each
+room (availability and noOta) are:
+
+[[update_avail]]
+
+update_avail(token, lcode, dfrom, rooms)
+
+[[update_sparse_avail]]
+
+update_sparse_avail(token, lcode, rooms)
+
+These functions are very similar. There is a unique difference.
+Before underlining the difference, let’s talk about a common point:
+both functions allow to update multiple rooms and multiple dates within
+a single call.
+
+Warning
+
+it should be considered crucial to develop a smart usage of these functions, trying to minimize
+the number of calls. In other words, trying to send data for multiple rooms within a single call.
+Moreover, avoide sending useless updates.
+A good approach could be this one: instead sending updates each time you have a modification on
+your system, collect them for, let’s say, 5 minutes. Then, read them all and send an unique message
+containing all the modifications.
+
+Warning
+
+a bad usage of this fuction could lead to a Wired API Ban (see Policies against abuses) and, at worst, a ban
+by the connected channels, which will stop to receive our updates.
+
+The difference between these functions is about the range of dates. The first
+function (update_avail()) is used to update the same range of dates
+for each involved room (altough it’s not necessary to update each day included
+on the range). The second one is used to update (eventually multiple) isolated days.
+
+To optimize things you probably need to support
+both functions. The first one should always be used when you have many days to
+be updated. The second one should be used only for particular cases, where the
+days to be updated are a few and isolated.
+
+If you want to make your life way easier by electing a unique function to be used
+for your updates, please choose the update_avail() call. Why? It
+will often happen to send big updates (for example 1 year starting from
+“today” for 10 rooms, 365 * 10= 3650 days). Using update_sparse_avail()
+for these updates would be very very poor and expensive.
+
+[[using-update-avail]]
+
+Using update_avail()
+
+The update_avail() function takes two trivial arguments (token
+and lcode) and two additional ones: dfrom and rooms. The dfrom
+argument is a date (string, european format).
+
+Calling update_avail() means that you want to update, starting from
+the dfrom date, an arbitrary number of days for one or multiple rooms.
+Let’s better understand this concept with a “geometrical” example,
+assuming dfrom= 21/12/2021 and that we want to update 3 days starting
+from this date for the rooms with ID= 1 and ID= 2:
+
+Room to update (ID)
+
+First day (21/12)
+
+22/12
+
+23/12
+
+1
+
+{‘avail’: 1}
+
+{}
+
+{‘no_ota’: 0}
+
+2
+
+{‘no_ota’: 1 ‘avail’: 1}
+
+{}
+
+{}
+
+As you can guess, the representation of one day is very flexible. You can
+selectively update values, modifying the parameters avail, no_ota,
+both or nothing. By considering this flexibility, you can also
+understand that using update_sparse_avail() can be skipped,
+due to the fact that update_avail() already provides the
+possibility to update only few days inside a range of dates.
+
+If you correctly understand the logic of the information that has to be sent, it will be easy to understand
+the following data structure:
+
+# We have an array, each element representing a room
+roomdays= [
+  # The first room:
+  {'id': 1, 'days': [{'avail': 1}, {}, {'no_ota': 0}],
+  # The second room:
+  {'id': 2, 'days': [{'no_ota': 1, 'avail': 1}, {}, {}],
+]
+
+Note
+
+Notice that all arrays have the same length. Use an empty day to eventually
+fit shorter arrays.
+
+In other words, the rooms parameter is an array. Each element is a KV strcuture
+having the following keys: id (the ID of the room) and days (daily values).
+The days key is used to provide an array of daily values, like this one:
+
+{'avail': 1, 'no_ota': 1}
+
+Which is, in xml:
+
+<struct>
+  <member>
+    <name>avail</name>
+    <value><int>1</int></value>
+  </member>
+  <member>
+    <name>no_ota</name>
+    <value><int>1</int></value>
+  </member>
+</struct>
+
+Always considering the previous example, this is the array
+for the Room with ID= 2:
+
+<array>
+  <data>
+    <value>   <!-- the first day -->
+      <struct>
+        <member>
+          <name>avail</name>
+          <value>
+            <int>1</int>
+          </value>
+        </member>
+        <member>
+          <name>no_ota</name>
+          <value>
+            <int>1</int>
+          </value>
+        </member>
+      </struct>
+    </value>
+    <value>  <!-- the second day -->
+      <struct></struct>
+    </value>
+    <value>  <!-- the third day -->
+      <struct></struct>
+    </value>
+  </data>
+</array>
+
+Finally, click on the following link for a full representation of the update call
+described on our example.
+
++ show/hide code
+[[hiddencodeblock5]]
+
+<methodCall>
+  <methodName>update_avail</methodName>
+  <params>
+    <param>
+      <value>
+        <string>9180470392.3814</string>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>1213394817</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <string>25/06/2015</string>
+      </value>
+    </param>
+    <param>
+      <value>
+        <array>
+          <data>
+            <value>
+              <struct>
+                <member>
+                  <name>id</name>
+                  <value>
+                    <int>1</int>
+                  </value>
+                </member>
+                <member>
+                  <name>days</name>
+                  <value>
+                    <array>
+                      <data>
+                        <value>
+                          <struct>
+                            <member>
+                              <name>avail</name>
+                              <value>
+                                <int>0</int>
+                              </value>
+                            </member>
+                            <member>
+                              <name>no_ota</name>
+                              <value>
+                                <int>0</int>
+                              </value>
+                            </member>
+                          </struct>
+                        </value>
+                      </data>
+                    </array>
+                  </value>
+                </member>
+              </struct>
+            </value>
+          </data>
+        </array>
+      </value>
+    </param>
+  </params>
+</methodCall>
+
+[[sparse-updates-using-update-sparse-avail]]
+
+Sparse updates ( using update_sparse_avail() )
+
+This function is very, very, very similar to the previous one. The structure you
+must send is equal, but each Day Representation contains an additional field:
+date. That’s an example to better understand its logic:
+
+<methodCall>
+  <methodName>update_sparse_avail</methodName>
+  <params>
+    <param>
+      <value>
+        <string>1111111111.1111</string>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>5555555555</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <array>
+          <data>
+            <value>
+              <struct>
+                <member>
+                  <name>id</name>
+                  <value>
+                    <string>1</string>
+                  </value>
+                </member>
+                <member>
+                  <name>days</name>
+                  <value>
+                    <array>
+                      <data>
+                        <value>
+                          <struct>
+                            <member>
+                              <name>avail</name>
+                              <value>
+                                <int>0</int>
+                              </value>
+                            </member>
+                            <member>
+                              <name>date</name>
+                              <value>
+                                <string>27/11/2016</string>
+                              </value>
+                            </member>
+                            <member>
+                              <name>no_ota</name>
+                              <value>
+                                <int>0</int>
+                              </value>
+                            </member>
+                          </struct>
+                        </value>
+                        <value>
+                          <struct>
+                            <member>
+                              <name>avail</name>
+                              <value>
+                                <int>0</int>
+                              </value>
+                            </member>
+                            <member>
+                              <name>date</name>
+                              <value>
+                                <string>27/11/2016</string>
+                              </value>
+                            </member>
+                            <member>
+                              <name>no_ota</name>
+                              <value>
+                                <int>0</int>
+                              </value>
+                            </member>
+                          </struct>
+                        </value>
+                      </data>
+                    </array>
+                  </value>
+                </member>
+              </struct>
+            </value>
+          </data>
+        </array>
+      </value>
+    </param>
+  </params>
+</methodCall>
+
+As you guess, each Array contains an arbitrary number of days to be updated. Each
+day representation must have a date parameter.
+
+[[reading-current-values]]
+
+Reading current values
+
+It’s also possible to read current values of your rooms. The following call
+returns them given a range of dates:
+
+[[fetch_rooms_values]]
+
+fetch_rooms_values(token, lcode, dfrom, dto[, rooms])
+
+The optional argument rooms is an array of Room IDs, to be used if you
+are just interested on a specific set of rooms. When not passed, this function
+returns values of all of your rooms (as a KV structure).
+
+Notice there is a limit on dates: the server will not accept dates too far
+in the future (limit is 2 years).
+
+For each room and for each day, you will have the following values (notice
+that the following example returns values for the room with ID= 1):
+
+{
+  '1': [
+    {
+      'closed_arrival': 0,
+      'booked': 0,
+      'max_stay': 0,
+      'price': 69.0,
+      'min_stay': 0,
+      'closed_departure': '0',
+      'avail': 1,
+      'closed': 0,
+      'min_stay_arrival': 0,
+      'no_ota': 0
+    },
+    {
+      'closed_arrival': 0,
+      'booked': 0,
+      'max_stay': 0,
+      'price': 69.0,
+      'min_stay': 0,
+      'closed_departure': '0',
+      'avail': 1,
+      'closed': 0,
+      'min_stay_arrival': 0,
+      'no_ota': 0
+    }
+  ]
+}
+
+Warning
+
+this function also returns prices/restrictions. You should ignore
+these values. To read prices and restrictions, please, read the
+following chapters (Handling Prices and Handling Restrictions). By the way,
+the returned restrictions are the Standard Restrictions.
+The prices are related to the WuBook Parity (unless you modify it,
+linking the WuBook Parity to a specific pricing plan).
+
+
+
+
+         Previous
+        Next
+
+
+
+
+
+
+© Copyright 2020, WuBook.
+
+
+
+  Built with Sphinx using a
+    theme
+    provided by Read the Docs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<meta content="Wired API, handling reservations" name="description" />
+<meta content="Wired, xml, api, channel manager, booking engine, reservations" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Handling Reservations &mdash; WuBook Technical Docs  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/rtd_custom_css.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/rtd_custom_js.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Channel Manager API" href="woodoo.html" />
+    <link rel="prev" title="Fetching reservations" href="fetch.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wubook_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../wired.html">Wired Api</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policies.html">Anti-abuse policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="certification.html">Certification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="return.html">Return values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rooms.html">Handling rooms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="avail.html">Updating availability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prices.html">Handling prices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rstrs.html">Handling restrictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fetch.html">Fetching reservations</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Handling reservations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cancel_reservation"><code class="docutils literal notranslate"><span class="pre">cancel_reservation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#confirm_reservation"><code class="docutils literal notranslate"><span class="pre">confirm_reservation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reconfirm_reservation"><code class="docutils literal notranslate"><span class="pre">reconfirm_reservation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#new_reservation"><code class="docutils literal notranslate"><span class="pre">new_reservation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="woodoo.html">Channel manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpolicies.html">Cancellation Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extras.html">Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html">Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corps.html">Corporate functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chainwidget.html">Chain Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webhooks.html">Webhooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="errormessages.html">Error codes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ord.html">Online Reception</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fount.html">Fount</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../woodooapi.html">WooDooApi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kapi.html">Zak API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WuBook Technical Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../wired.html">Wired</a></li>
+      <li class="breadcrumb-item active">Handling Reservations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wired/rsrvs.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="handling-reservations">
+<h1>Handling Reservations<a class="headerlink" href="#handling-reservations" title="Permalink to this heading"></a></h1>
+<p>Wired makes possible to insert new reservations and to cancel existing ones.
+To do that, you just have two functions:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="cancel_reservation">
+<span class="sig-name descname"><span class="pre">cancel_reservation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rcode</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">reason=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_voucher=1</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#cancel_reservation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="confirm_reservation">
+<span class="sig-name descname"><span class="pre">confirm_reservation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rcode</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">reason=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_voucher=1</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#confirm_reservation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reconfirm_reservation">
+<span class="sig-name descname"><span class="pre">reconfirm_reservation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rcode</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">reason=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_voucher=1</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#reconfirm_reservation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="new_reservation">
+<span class="sig-name descname"><span class="pre">new_reservation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dto</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rooms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">customer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">origin='xml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccard=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillary=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guests=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_restrs=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_avail=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status=1</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#new_reservation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p><strong>cancel_reservation()</strong> is used to cancel an active reservation.
+<strong>confirm_reservation()</strong> is used to confirm a reservation waiting for confirmation
+<strong>reconfirm_reservation()</strong> is used to reconfirm a reservation previously deleted.
+Notice that it’s not possible to modify reservations originated by OTAs.
+You can just modify direct reservations (received via the wubook’s booking engine).
+The <strong>reason</strong> parameter is just a string and acts as a remark while <strong>send_voucher</strong>
+determines if Wired should send a voucher to the customer or not.</p>
+<p>The <strong>new_reservation()</strong> function is used, instead, to insert new reservations.
+Combined with the <a class="reference internal" href="../fount.html"><span class="doc">WuBook Fount - Selling rooms on your site</span></a>, it can even be used to develop a basic, but
+powerful, booking engine.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>To use the <strong>new_reservation()</strong> call, you need to subscribe to WooDoo Online Reception or to WooDoo Whitelabel Standard package</p>
+</div>
+<p>The <strong>rooms</strong> argument is a KW structure, like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rooms</span><span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">quantity</span><span class="p">,</span> <span class="n">board</span><span class="p">],</span>
+  <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">quantity</span><span class="p">,</span> <span class="n">board</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>To better understand possible values of the <strong>board</strong> field, please, refere to
+the <a class="reference internal" href="rooms.html"><span class="doc">Handling Rooms</span></a> section.
+Also the <strong>customer</strong> argument is a KV structure and
+it must contain the following keys: <em>lname</em> (last name), <em>fname</em> (first name),
+<em>email</em>, <em>city</em>, <em>phone</em>, <em>street</em>, <em>country</em>, <em>arrival_hour</em> and <em>notes</em> (remarks).
+The country parameter is the 2-digit country symbol, for example: IT,UK,FR,US,RU and so on.</p>
+<p>The <strong>origin</strong> field is a kind of <em>signature</em>: this way, you can tag the reservation with
+an “Originated by” tag. The <strong>ccard</strong> field is used if you want to provide a CC guarantee
+for this reservation. It’s a KV structure with the following fields:
+<strong>cc_exp_year</strong>, <strong>cc_exp_month</strong>, <strong>cc_type</strong>, <strong>cc_cvv</strong>, <strong>cc_owner</strong> and <strong>cc_number</strong>.
+In particular, the <em>cc_type</em> field represents the credit card family (VISA, MASTERCARD…).
+It is an integer, check the following table to discover its possible values:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Family</p></th>
+<th class="head"><p>Integer</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>VISA</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>MASTERCARD</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>DISCOVER</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>AMERICAN_EXPRESS</p></td>
+<td><p>8</p></td>
+</tr>
+<tr class="row-even"><td><p>ENROUTE</p></td>
+<td><p>16</p></td>
+</tr>
+<tr class="row-odd"><td><p>JCB</p></td>
+<td><p>32</p></td>
+</tr>
+<tr class="row-even"><td><p>DINERS</p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="row-odd"><td><p>TEST</p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="row-even"><td><p>MAESTRO</p></td>
+<td><p>256</p></td>
+</tr>
+<tr class="row-odd"><td><p>BLANCHE</p></td>
+<td><p>512</p></td>
+</tr>
+<tr class="row-even"><td><p>AUSTRALIAN</p></td>
+<td><p>1024</p></td>
+</tr>
+<tr class="row-odd"><td><p>EUROCARD</p></td>
+<td><p>8192</p></td>
+</tr>
+<tr class="row-even"><td><p>UNIONPAY</p></td>
+<td><p>16384</p></td>
+</tr>
+<tr class="row-odd"><td><p>BOOKCOM</p></td>
+<td><p>32768</p></td>
+</tr>
+<tr class="row-even"><td><p>CARTEBLEUE</p></td>
+<td><p>65536</p></td>
+</tr>
+<tr class="row-odd"><td><p>CARTEBANCAIRE</p></td>
+<td><p>131072</p></td>
+</tr>
+<tr class="row-even"><td><p>MNP</p></td>
+<td><p>262144</p></td>
+</tr>
+<tr class="row-odd"><td><p>VISA ELECTRON</p></td>
+<td><p>524288</p></td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>ancillary</strong> field is an arbitrary KV structure, where you can collect
+additional information.</p>
+<p><strong>Guests</strong> is a KV stucture containing additional people in the reservation and it’s arbitrary; guests
+wants two params, “men” and “children”. If used, you have to specify at least an integer
+for the “men” param, otherwise you’ll encounter an error.</p>
+<p>The <strong>ignore_restrs</strong> parameter, if set to 1, will avoid restrictions like “Min. Stay”, “Min. Stay Arrival”, “Max. Stay”, etc. And the <strong>ignore_avail</strong> parameter, if set to 1, will insert the reservation even if there is no availability for the specified room(s).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Ignore Restrictions and/or Availability should be used just for specific integration cases. A bad use of these params, can cause confusion and even overbooking.</p>
+</div>
+<p>Using the <strong>status</strong> parameter, you can create a <cite>waiting for approval</cite> reservation (status=2) or a <cite>confirmed</cite> one (status=1)</p>
+<p>Below, you’ll find an xml example of a call followed by an answer of the <strong>new_reservation()</strong> function.</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock38'))">+ show/hide code</a><br /><div id="hiddencodeblock38" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&#39;1.0&#39;?&gt;</span>
+<span class="nt">&lt;methodCall&gt;</span>
+<span class="w">  </span><span class="nt">&lt;methodName&gt;</span>new_reservation<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>YOUR_TOKEN<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;&lt;value&gt;&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;&lt;/value&gt;&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;&lt;value&gt;&lt;string&gt;</span>21/02/2025<span class="nt">&lt;/string&gt;&lt;/value&gt;&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;&lt;value&gt;&lt;string&gt;</span>22/02/2025<span class="nt">&lt;/string&gt;&lt;/value&gt;&lt;/param&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- rooms --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>45052<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;array&gt;</span>
+<span class="w">                </span><span class="nt">&lt;data&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;string&gt;</span>hb<span class="nt">&lt;/string&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- customer --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>lname<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>LASTNAME<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>fname<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>FIRSTNAME<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>email<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;string&gt;</span>example@domain.net<span class="nt">&lt;/string&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>country<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>IT<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- amount --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;double&gt;</span>100.0<span class="nt">&lt;/double&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- origin --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>xml<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- credit card --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- ancillary --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>some_structured_info<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;string&gt;</span>more<span class="w"> </span>info<span class="w"> </span>here<span class="nt">&lt;/string&gt;&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- guests --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>men<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>2<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>children<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodCall&gt;</span>
+
+<span class="nt">&lt;methodResponse&gt;</span>
+<span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;array&gt;</span>
+<span class="w">          </span><span class="nt">&lt;data&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;string&gt;</span>1726577593<span class="nt">&lt;/string&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodResponse&gt;</span>
+</pre></div>
+</div>
+</div></section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fetch.html" class="btn btn-neutral float-left" title="Fetching reservations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="woodoo.html" class="btn btn-neutral float-right" title="Channel Manager API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, WuBook.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+<!--<div style="margin-left:620px">-->
+<!--<a style="color:red" href="http://en.wubook.net">WuBook Website</a> -->
+<!--<style>-->
+<!--.descname {-->
+        <!--color: #E69138;-->
+        <!--}-->
+        <!--div.note {-->
+                <!--background-color: #ddffd1;-->
+                <!--}-->
+                <!--.sphinxsidebarwrapper_zzz {-->
+                        <!--border-right: 1px solid #999999;-->
+                        <!--}-->
+                        <!--h1 {-->
+                                <!--font-size: 180% !important;-->
+                                <!--color: #db0000 !important;-->
+                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                <!--}-->
+                                <!--h2 {-->
+                                        <!--font-size: 160% !important;-->
+                                        <!--color: #db0000 !important;-->
+                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                        <!--}-->
+                                        <!--p {-->
+                                                <!--font-size: 110% !important;-->
+                                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                <!--color: #3E4349-->
+                                                <!--}-->
+                                                <!--div.body {-->
+                                                        <!--font-size: 110% !important;-->
+                                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                        <!--color: #3E4349-->
+                                                        <!--}-->
+                                                        <!--</style>-->
+<!--</div>-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-4959530-27', 'auto');
+    ga('set', 'anonymizeIp', true);
+    ga('send', 'pageview');
+</script>
+   
+
+
+</body>
+</html>

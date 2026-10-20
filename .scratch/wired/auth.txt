@@ -1,0 +1,88 @@
+
+
+
+
+[[wired-authentication]]
+
+Wired Authentication
+
+To use the Wired functions, you need to generate a permanent token (https://wubook.net/wauth/wauth/dash/wired/).
+
+Then, the token will be sent as first argument to the available functions.
+
+[[property-identifier]]
+
+Property Identifier
+
+A great part of the Wired fuctions requires, as second argument, the
+lcode parameter. The lcode is an integer, uniquely identifying
+a property (property id).
+
+It can be found by:
+
+Entering the WuBook Control Panel and visiting the Facility/Site section
+
+In the Wubook Account panel, ( https://wubook.net/wauth/wauth/dash/admin/?s=prop ) under Hotel ID
+
+Using the Corporate Control Panel (if you are a corporate)
+
+Using the Corporate Wired functions (if you are a corporate)
+
+
+
+
+         Previous
+        Next
+
+
+
+
+
+
+© Copyright 2020, WuBook.
+
+
+
+  Built with Sphinx using a
+    theme
+    provided by Read the Docs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

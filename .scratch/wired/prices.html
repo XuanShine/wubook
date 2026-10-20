@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<meta content="Wired API, handling prices" name="description" />
+<meta content="Wired, xml, api, channel manager, booking engine, prices" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Handling Prices &mdash; WuBook Technical Docs  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/rtd_custom_css.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/rtd_custom_js.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Handling Restrictions" href="rstrs.html" />
+    <link rel="prev" title="Wired: updating availability" href="avail.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wubook_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../wired.html">Wired Api</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policies.html">Anti-abuse policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="certification.html">Certification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="return.html">Return values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rooms.html">Handling rooms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="avail.html">Updating availability</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Handling prices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-wubook-parity">The WuBook Parity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pricing-plans-management">Pricing plans management</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#add_pricing_plan"><code class="docutils literal notranslate"><span class="pre">add_pricing_plan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#add_vplan"><code class="docutils literal notranslate"><span class="pre">add_vplan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#del_plan"><code class="docutils literal notranslate"><span class="pre">del_plan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#update_plan_name"><code class="docutils literal notranslate"><span class="pre">update_plan_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get_pricing_plans"><code class="docutils literal notranslate"><span class="pre">get_pricing_plans()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#update_plan_rack"><code class="docutils literal notranslate"><span class="pre">update_plan_rack()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mod_vplans"><code class="docutils literal notranslate"><span class="pre">mod_vplans()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#handling-pricing-plans">Handling Pricing Plans</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#update_plan_prices"><code class="docutils literal notranslate"><span class="pre">update_plan_prices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fetch_plan_prices"><code class="docutils literal notranslate"><span class="pre">fetch_plan_prices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#handling-intensive-plans-deprecated-do-not-implement">Handling Intensive Plans (DEPRECATED, do NOT implement)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rstrs.html">Handling restrictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fetch.html">Fetching reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rsrvs.html">Handling reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woodoo.html">Channel manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpolicies.html">Cancellation Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extras.html">Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html">Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corps.html">Corporate functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chainwidget.html">Chain Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webhooks.html">Webhooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="errormessages.html">Error codes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ord.html">Online Reception</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fount.html">Fount</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../woodooapi.html">WooDooApi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kapi.html">Zak API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WuBook Technical Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../wired.html">Wired</a></li>
+      <li class="breadcrumb-item active">Handling Prices</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wired/prices.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="handling-prices">
+<h1>Handling Prices<a class="headerlink" href="#handling-prices" title="Permalink to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<p>WuBook supports multiple <strong>Pricing Plans</strong> for each property, also known as rates.
+If you connect
+WuBook to provide a channel manager service, you need to provide the possibility
+to manage them,
+because the connectivity to your OTAs depends on that: booking.com and expedia, for
+example, require different prices for different rates and you must be able to
+manage these features.</p>
+</section>
+<section id="the-wubook-parity">
+<h2>The WuBook Parity<a class="headerlink" href="#the-wubook-parity" title="Permalink to this heading"></a></h2>
+<p>Each property has a standard pricing plan: the <strong>WuBook Parity</strong>.
+This pricing plan contains the default
+prices for the Online Reception (the wubook booking engine). If the Online
+Reception of WuBook is not used, the WuBook Parity is like another pricing
+plan, without particular features.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>the WuBook Parity Pricing Plan has always ID= 0 for each property
+and can not be removed</p>
+</div>
+</section>
+<section id="pricing-plans-management">
+<h2>Pricing plans management<a class="headerlink" href="#pricing-plans-management" title="Permalink to this heading"></a></h2>
+<p>To add a new Pricing Plan, the following function is used:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="add_pricing_plan">
+<span class="sig-name descname"><span class="pre">add_pricing_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#add_pricing_plan" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>This function returns the ID of the new plan.</p>
+<p>To add a new Virtual Pricing Plan, you use:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="add_vplan">
+<span class="sig-name descname"><span class="pre">add_vplan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#add_vplan" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>Where <strong>pid</strong> is the Plan Id of the Parent Pricing Plan, while
+<strong>dtype</strong> is an integer:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>-2</strong>: This plan is a discount. Value is a fixed amount</p></li>
+<li><p><strong>-1</strong>: This plan is a discount. Value is a percentage</p></li>
+<li><p><strong>1</strong>:  This plan increases prices. Value is a percentage</p></li>
+<li><p><strong>2</strong>:  This plan increases prices. Value is a fixed amount</p></li>
+</ul>
+</div></blockquote>
+<p>Given the <strong>dtype</strong> integer, <strong>value</strong> is the quantity of the
+variation (a float or an integer), for example:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>variation= 10, variation_type= 1: you have an increase of 10%</p></li>
+<li><p>variation= 30, variation_type= -2: you have a decrease of 30 EUR (currency being obviously dynamic)</p></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Functions adding a new plan always return the assigned ID</p>
+</div>
+<p>To remove a pricing plan, one uses:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="del_plan">
+<span class="sig-name descname"><span class="pre">del_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#del_plan" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>where <strong>pid</strong> is the ID of the plan which must be removed.</p>
+<p>To update the name of a pricing plan:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="update_plan_name">
+<span class="sig-name descname"><span class="pre">update_plan_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#update_plan_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>Finally, to fetch the existing pricing plans of a property, there is
+the following function:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="get_pricing_plans">
+<span class="sig-name descname"><span class="pre">get_pricing_plans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#get_pricing_plans" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>The return value of this call is an array, each element being a Pricing Plan.
+Each item is a KV structure, containing the following fields:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>id</strong></p></td>
+<td><p>Eh, the ID of the plan</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>name</strong></p></td>
+<td><p>The name of the plan</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>daily</strong></p></td>
+<td><p>1 for daily plans</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>vpid</strong></p></td>
+<td><p>If plan is virtual, this is the PID (plan id) of its parent</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>variation</strong></p></td>
+<td><p>If plan is virtual, this is the price variation amount</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>variation_type</strong></p></td>
+<td><p>If plan is virtual, this is the price variation type</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>About <strong>variation</strong> and <strong>variation_type</strong>, check the documentation of
+<a class="reference internal" href="#add_vplan" title="add_vplan"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_vplan()</span></code></a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="update_plan_rack">
+<span class="sig-name descname"><span class="pre">update_plan_rack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rack</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#update_plan_rack" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>Pricing plans have default values (when default values of a pricing plan are not
+specified, the default prices become the default room prices, see the rooms
+section). The update_plan_rack() function is used to modify them.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>not available for the WuBook Parity Pricing Plan (ID= 0)</p>
+</div>
+<p>The <strong>rack</strong> argument is a KV structure:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span>
+  <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For each room, you specify the default price depending on the day of the week
+(so, arrays have always lenght= 7).</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mod_vplans">
+<span class="sig-name descname"><span class="pre">mod_vplans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plans</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mod_vplans" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>The function <strong>mod_vplans</strong> allows to manage Virtual
+Plans, modifying the <strong>variation</strong> and the <strong>variation_type</strong>. The <strong>plans</strong>
+argument is an array of KV structures, each one containing information about
+the ID of the plan and the desired <strong>variation_type/variation</strong>, like that:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plans</span><span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;pid&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;variation&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;variation_type&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;pid&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;variation&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;variation_type&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span><span class="p">}]</span>
+</pre></div>
+</div>
+</section>
+<section id="handling-pricing-plans">
+<h2>Handling Pricing Plans<a class="headerlink" href="#handling-pricing-plans" title="Permalink to this heading"></a></h2>
+<p>There are just two functions to completely manage Daily Pricing Plans. One is
+used to write, the other to read:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="update_plan_prices">
+<span class="sig-name descname"><span class="pre">update_plan_prices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#update_plan_prices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fetch_plan_prices">
+<span class="sig-name descname"><span class="pre">fetch_plan_prices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dto</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">rooms=</span> <span class="pre">[]</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#fetch_plan_prices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>To update the values of a Pricing Plan, you use <strong>update_plan_prices()</strong>.
+The <strong>pid</strong> parameter is the ID of the Pricing Plan you want to modify.
+The <strong>dfrom</strong> parameter is the Starting Date (european format: 21/12/2021).
+The <strong>prices</strong> parameter is a KV structure. Keys are Room IDs. Values are
+array of prices. Prices <strong>must be</strong> greater than 0.01.
+The following example will explain it better:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prices</span><span class="o">=</span> <span class="p">{</span>
+  <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">102</span><span class="p">],</span>
+  <span class="s2">&quot;2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">202</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The previuos KV structure is used to setup the following prices (assming
+dfrom= 21/12/2021):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Room</span> <span class="n">Id</span><span class="p">:</span> <span class="mi">1</span>
+  <span class="mi">21</span><span class="o">/</span><span class="mi">12</span><span class="p">:</span> <span class="mi">100</span>
+  <span class="mi">22</span><span class="o">/</span><span class="mi">12</span><span class="p">:</span> <span class="mi">101</span>
+  <span class="mi">23</span><span class="o">/</span><span class="mi">12</span><span class="p">:</span> <span class="mi">102</span>
+
+<span class="n">Room</span> <span class="n">Id</span><span class="p">:</span> <span class="mi">2</span>
+  <span class="mi">21</span><span class="o">/</span><span class="mi">12</span><span class="p">:</span> <span class="mi">200</span>
+  <span class="mi">22</span><span class="o">/</span><span class="mi">12</span><span class="p">:</span> <span class="mi">201</span>
+  <span class="mi">23</span><span class="o">/</span><span class="mi">12</span><span class="p">:</span> <span class="mi">202</span>
+</pre></div>
+</div>
+<p>The underlying xml (for the Room with id= 1) is:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;struct&gt;</span>
+<span class="w">  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">    </span><span class="nt">&lt;name&gt;</span>1<span class="nt">&lt;/name&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;array&gt;&lt;data&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>100<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>101<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>102<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/data&gt;&lt;/array&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">    </span><span class="nt">&lt;name&gt;</span>2<span class="nt">&lt;/name&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;</span>
+<span class="w">      </span>....
+<span class="w">    </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/member&gt;</span>
+<span class="nt">&lt;/struct&gt;</span>
+</pre></div>
+</div>
+<p>Finally, click on the following link for a full representation of the update call described on our example.</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock27'))">+ show/hide code</a><br /><div id="hiddencodeblock27" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;methodCall&gt;</span>
+<span class="w">  </span><span class="nt">&lt;methodName&gt;</span>update_plan_prices<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;string&gt;</span>9924436598.9239<span class="nt">&lt;/string&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>1234234<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;string&gt;</span>10/10/2017<span class="nt">&lt;/string&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">          </span><span class="nt">&lt;member&gt;</span>
+<span class="w">            </span><span class="nt">&lt;name&gt;</span>2<span class="nt">&lt;/name&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;array&gt;</span>
+<span class="w">                </span><span class="nt">&lt;data&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;double&gt;</span>1.1<span class="nt">&lt;/double&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;int&gt;</span>2<span class="nt">&lt;/int&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;int&gt;</span>3<span class="nt">&lt;/int&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodCall&gt;</span>
+</pre></div>
+</div>
+</div><p>The <strong>function fetch_plan_prices()</strong> is used to read current values of one pricing
+plan. The <strong>dfrom</strong> and <strong>dto</strong> arguments are used to select a range of dates.
+You use the <strong>rooms</strong> parameter (an array of integers, each one representing a
+room ID) if you are just interested on a particular set of rooms (otherwise,
+prices of all rooms are returned).</p>
+<p>The return value is a KV structure, very similar to the one used to modify
+prices (see  <a class="reference internal" href="#update_plan_prices" title="update_plan_prices"><code class="xref py py-func docutils literal notranslate"><span class="pre">update_plan_prices()</span></code></a>)</p>
+</section>
+<section id="handling-intensive-plans-deprecated-do-not-implement">
+<h2>Handling Intensive Plans (DEPRECATED, do NOT implement)<a class="headerlink" href="#handling-intensive-plans-deprecated-do-not-implement" title="Permalink to this heading"></a></h2>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock28'))">+ show/hide code</a><br /><div id="hiddencodeblock28" style="display: none"><div class="highlight-html notranslate"><div class="highlight"><pre><span></span>As already stated before, if possible do not develop Intensive Plans functions.
+Dealing with Daily Pricing Plans is easier and enough on the great part of cases.
+
+Anyway, to manage Intensive Pricing Plans you have the following functions:
+
+.. function:: convert_to_daily_plan(token, lcode, pid)
+.. function:: update_plan_periods(token, lcode, pid, periods)
+.. function:: delete_periods(token, lcode, pid, delperiods)
+
+The function **convert_to_daily_plan()** is used to transform an Intensive
+Pricing Plan to a Daily Pricing Plan. Very useful if you have existing
+Intensive Pricing Plan and you correctly want to manage only Daily Plans.
+
+The function **update_plan_periods()** is used to modify prices. As described
+on the introduction of this chapter, Intensive Pricing Plans define prices
+depending on the range of dates. Moreover, inside each range of dates, you
+can differentiate prices depending on the day of the week.
+
+
+.. warning::
+
+  Keep in mind you can send a maximum of 20 periods per call, 160 calls per hour.
+
+The **periods** argument is used to specify prices and range of dates. It is
+an array, each element containing a range of dates and relative prices. Each
+element is a KV structure containing three fields: **dfrom**, **dto** and
+**values**. The **values** key contains the prices and it&#39;s equal to the
+structure used for the function :func:`update_plan_rack`.
+That&#39;s an example:
+
+.. code-block:: python
+
+  periods= [
+    {
+      &#39;dfrom&#39;: 21/10/2021&#39;,
+      &#39;dto&#39;: 12/12/2021&#39;,
+      &#39;values&#39;: {
+        &#39;1&#39;: [1,2,3,4,5,6,7],
+        &#39;2&#39;: [1,2,3,4,5,6,7],
+      }
+    },
+    {
+      &#39;dfrom&#39;: 21/10/2080&#39;,
+      &#39;dto&#39;: 12/12/2080&#39;,
+      &#39;values&#39;: {
+        &#39;1&#39;: [1,2,3,4,5,6,7],
+        &#39;2&#39;: [1,2,3,4,5,6,7],
+      }
+    }
+  ]
+
+
+Now that you know how to define prices for particular ranges of dates, you can
+have the need to delete them (restoring that way the default prices of the
+pricing plan -rack-). To do that, one uses **delete_periods()**. This time,
+the argument **periods** is a list of KV structs which contains just ranges
+of dates, like that:
+
+.. code-block:: python
+
+  periods= [{&#39;dfrom&#39;: &#39;10/12/2020&#39;, &#39;dto&#39;: &#39;20/12/2020&#39;}, {&#39;dfrom&#39;: &#39;10/01/2040&#39;, &#39;dto&#39;: &#39;20/01/2040&#39;}]
+</pre></div>
+</div>
+</div></section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="avail.html" class="btn btn-neutral float-left" title="Wired: updating availability" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rstrs.html" class="btn btn-neutral float-right" title="Handling Restrictions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, WuBook.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+<!--<div style="margin-left:620px">-->
+<!--<a style="color:red" href="http://en.wubook.net">WuBook Website</a> -->
+<!--<style>-->
+<!--.descname {-->
+        <!--color: #E69138;-->
+        <!--}-->
+        <!--div.note {-->
+                <!--background-color: #ddffd1;-->
+                <!--}-->
+                <!--.sphinxsidebarwrapper_zzz {-->
+                        <!--border-right: 1px solid #999999;-->
+                        <!--}-->
+                        <!--h1 {-->
+                                <!--font-size: 180% !important;-->
+                                <!--color: #db0000 !important;-->
+                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                <!--}-->
+                                <!--h2 {-->
+                                        <!--font-size: 160% !important;-->
+                                        <!--color: #db0000 !important;-->
+                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                        <!--}-->
+                                        <!--p {-->
+                                                <!--font-size: 110% !important;-->
+                                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                <!--color: #3E4349-->
+                                                <!--}-->
+                                                <!--div.body {-->
+                                                        <!--font-size: 110% !important;-->
+                                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                        <!--color: #3E4349-->
+                                                        <!--}-->
+                                                        <!--</style>-->
+<!--</div>-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-4959530-27', 'auto');
+    ga('set', 'anonymizeIp', true);
+    ga('send', 'pageview');
+</script>
+   
+
+
+</body>
+</html>

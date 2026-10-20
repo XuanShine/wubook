@@ -1,0 +1,342 @@
+
+
+
+
+[[handling-reservations]]
+
+Handling Reservations
+
+Wired makes possible to insert new reservations and to cancel existing ones.
+To do that, you just have two functions:
+
+[[cancel_reservation]]
+
+cancel_reservation(token, lcode, rcode[, reason='', send_voucher=1])
+
+[[confirm_reservation]]
+
+confirm_reservation(token, lcode, rcode[, reason='', send_voucher=1])
+
+[[reconfirm_reservation]]
+
+reconfirm_reservation(token, lcode, rcode[, reason='', send_voucher=1])
+
+[[new_reservation]]
+
+new_reservation(token, lcode, dfrom, dto, rooms, customer, amount[, origin='xml', ccard=0, ancillary=0, guests=0, ignore_restrs=0, ignore_avail=0, status=1])
+
+cancel_reservation() is used to cancel an active reservation.
+confirm_reservation() is used to confirm a reservation waiting for confirmation
+reconfirm_reservation() is used to reconfirm a reservation previously deleted.
+Notice that it’s not possible to modify reservations originated by OTAs.
+You can just modify direct reservations (received via the wubook’s booking engine).
+The reason parameter is just a string and acts as a remark while send_voucher
+determines if Wired should send a voucher to the customer or not.
+
+The new_reservation() function is used, instead, to insert new reservations.
+Combined with the WuBook Fount - Selling rooms on your site, it can even be used to develop a basic, but
+powerful, booking engine.
+
+Warning
+
+To use the new_reservation() call, you need to subscribe to WooDoo Online Reception or to WooDoo Whitelabel Standard package
+
+The rooms argument is a KW structure, like this:
+
+rooms= {
+  '1': [quantity, board],
+  '2': [quantity, board],
+}
+
+To better understand possible values of the board field, please, refere to
+the Handling Rooms section.
+Also the customer argument is a KV structure and
+it must contain the following keys: lname (last name), fname (first name),
+email, city, phone, street, country, arrival_hour and notes (remarks).
+The country parameter is the 2-digit country symbol, for example: IT,UK,FR,US,RU and so on.
+
+The origin field is a kind of signature: this way, you can tag the reservation with
+an “Originated by” tag. The ccard field is used if you want to provide a CC guarantee
+for this reservation. It’s a KV structure with the following fields:
+cc_exp_year, cc_exp_month, cc_type, cc_cvv, cc_owner and cc_number.
+In particular, the cc_type field represents the credit card family (VISA, MASTERCARD…).
+It is an integer, check the following table to discover its possible values:
+
+Family
+
+Integer
+
+VISA
+
+1
+
+MASTERCARD
+
+2
+
+DISCOVER
+
+4
+
+AMERICAN_EXPRESS
+
+8
+
+ENROUTE
+
+16
+
+JCB
+
+32
+
+DINERS
+
+64
+
+TEST
+
+128
+
+MAESTRO
+
+256
+
+BLANCHE
+
+512
+
+AUSTRALIAN
+
+1024
+
+EUROCARD
+
+8192
+
+UNIONPAY
+
+16384
+
+BOOKCOM
+
+32768
+
+CARTEBLEUE
+
+65536
+
+CARTEBANCAIRE
+
+131072
+
+MNP
+
+262144
+
+VISA ELECTRON
+
+524288
+
+The ancillary field is an arbitrary KV structure, where you can collect
+additional information.
+
+Guests is a KV stucture containing additional people in the reservation and it’s arbitrary; guests
+wants two params, “men” and “children”. If used, you have to specify at least an integer
+for the “men” param, otherwise you’ll encounter an error.
+
+The ignore_restrs parameter, if set to 1, will avoid restrictions like “Min. Stay”, “Min. Stay Arrival”, “Max. Stay”, etc. And the ignore_avail parameter, if set to 1, will insert the reservation even if there is no availability for the specified room(s).
+
+Warning
+
+Ignore Restrictions and/or Availability should be used just for specific integration cases. A bad use of these params, can cause confusion and even overbooking.
+
+Using the status parameter, you can create a waiting for approval reservation (status=2) or a confirmed one (status=1)
+
+Below, you’ll find an xml example of a call followed by an answer of the new_reservation() function.
+
++ show/hide code
+[[hiddencodeblock38]]
+
+<?xml version='1.0'?>
+<methodCall>
+  <methodName>new_reservation</methodName>
+  <params>
+    <param>
+      <value><string>YOUR_TOKEN</string></value>
+    </param>
+    <param><value><int>1213394817</int></value></param>
+    <param><value><string>21/02/2025</string></value></param>
+    <param><value><string>22/02/2025</string></value></param>
+    <!-- rooms -->
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>45052</name>
+            <value>
+              <array>
+                <data>
+                  <value><int>1</int></value>
+                  <value>
+                    <string>hb</string>
+                  </value>
+                </data>
+              </array>
+            </value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <!-- customer -->
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>lname</name>
+            <value><string>LASTNAME</string></value>
+          </member>
+          <member>
+            <name>fname</name>
+            <value><string>FIRSTNAME</string></value>
+          </member>
+          <member>
+            <name>email</name>
+            <value>
+              <string>example@domain.net</string>
+            </value>
+          </member>
+          <member>
+            <name>country</name>
+            <value><string>IT</string></value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <!-- amount -->
+    <param>
+      <value><double>100.0</double></value>
+    </param>
+    <!-- origin -->
+    <param>
+      <value><string>xml</string></value>
+    </param>
+    <!-- credit card -->
+    <param>
+      <value><int>0</int></value>
+    </param>
+    <!-- ancillary -->
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>some_structured_info</name>
+            <value><string>more info here</string></value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <!-- guests -->
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>men</name>
+            <value><int>2</int></value>
+          </member>
+          <member>
+            <name>children</name>
+            <value><int>1</int></value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <param>
+      <value><int>0</int></value>
+    </param>
+    <param>
+      <value><int>0</int></value>
+    </param>
+    <param>
+      <value><int>1</int></value>
+    </param>
+  </params>
+</methodCall>
+
+<methodResponse>
+  <params>
+    <param>
+      <value>
+        <array>
+          <data>
+            <value>
+              <int>0</int>
+            </value>
+            <value>
+              <string>1726577593</string>
+            </value>
+          </data>
+        </array>
+      </value>
+    </param>
+  </params>
+</methodResponse>
+
+
+
+
+         Previous
+        Next
+
+
+
+
+
+
+© Copyright 2020, WuBook.
+
+
+
+  Built with Sphinx using a
+    theme
+    provided by Read the Docs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

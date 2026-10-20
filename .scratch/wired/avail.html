@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<meta content="Wired API, handling availability" name="description" />
+<meta content="Wired, xml, api, channel manager, booking engine, availability" name="keywords" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wired: updating availability &mdash; WuBook Technical Docs  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/rtd_custom_css.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/rtd_custom_js.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Handling Prices" href="prices.html" />
+    <link rel="prev" title="Handling Rooms" href="rooms.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/wubook_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../wired.html">Wired Api</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policies.html">Anti-abuse policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="certification.html">Certification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="return.html">Return values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rooms.html">Handling rooms</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Updating availability</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#updating-availability">Updating availability</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#update_avail"><code class="docutils literal notranslate"><span class="pre">update_avail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#update_sparse_avail"><code class="docutils literal notranslate"><span class="pre">update_sparse_avail()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#using-update-avail">Using update_avail()</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sparse-updates-using-update-sparse-avail">Sparse updates ( using update_sparse_avail() )</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reading-current-values">Reading current values</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fetch_rooms_values"><code class="docutils literal notranslate"><span class="pre">fetch_rooms_values()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="prices.html">Handling prices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rstrs.html">Handling restrictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fetch.html">Fetching reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rsrvs.html">Handling reservations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="woodoo.html">Channel manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpolicies.html">Cancellation Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extras.html">Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transactions.html">Transactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corps.html">Corporate functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chainwidget.html">Chain Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webhooks.html">Webhooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="errormessages.html">Error codes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ord.html">Online Reception</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fount.html">Fount</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../woodooapi.html">WooDooApi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../kapi.html">Zak API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">WuBook Technical Docs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../wired.html">Wired</a></li>
+      <li class="breadcrumb-item active">Wired: updating availability</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/wired/avail.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="wired-updating-availability">
+<h1>Wired: updating availability<a class="headerlink" href="#wired-updating-availability" title="Permalink to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<p>Let’s begin with a simple consideration: WooDoo availability is
+room oriented, meaning that each room has its own availability.
+Altough this option is the most common, it’s better to explicitely
+specify it. For some OTAs, in fact, the availability is rate oriented
+(this means that having 3 rooms and 2 rates, you have 6 availability
+contingents to manage).</p>
+<p>There are two availability parameters:</p>
+<ul class="simple">
+<li><p><strong>Availability:</strong> often referred as <em>avail</em>, this is the availability of one room</p></li>
+<li><p><strong>No Ota:</strong> when activated, wubook sends zero availability to the connected OTAs, even when the availability is positive. This is mainly used to sell, at least for a range of dates, a particular room only on the WooDoo Online Reception (booking engine), closing the sales on third channels</p></li>
+</ul>
+</section>
+<section id="updating-availability">
+<h2>Updating availability<a class="headerlink" href="#updating-availability" title="Permalink to this heading"></a></h2>
+<p>The functions to manage the two availability parameters for each
+room (availability and noOta) are:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="update_avail">
+<span class="sig-name descname"><span class="pre">update_avail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rooms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#update_avail" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="update_sparse_avail">
+<span class="sig-name descname"><span class="pre">update_sparse_avail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rooms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#update_sparse_avail" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>These functions are very similar. There is a unique difference.
+Before underlining the difference, let’s talk about a common point:
+both functions allow to update multiple rooms and multiple dates within
+a single call.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>it should be considered crucial to develop a smart usage of these functions, trying to minimize
+the number of calls. In other words, trying to send data for multiple rooms within a single call.
+Moreover, avoide sending useless updates.
+A good approach could be this one: instead sending updates each time you have a modification on
+your system, collect them for, let’s say, 5 minutes. Then, read them all and send an unique message
+containing all the modifications.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>a bad usage of this fuction could lead to a Wired API Ban (see <a class="reference internal" href="policies.html"><span class="doc">Policies against abuses</span></a>) and, at worst, a ban
+by the connected channels, which will stop to receive our updates.</p>
+</div>
+<p>The difference between these functions is about the <strong>range of dates</strong>. The first
+function (<em>update_avail()</em>) is used to update the same range of dates
+for each involved room (altough it’s not necessary to update each day included
+on the range). The second one is used to update (eventually multiple) isolated days.</p>
+<p>To optimize things you probably need to support
+both functions. The first one should always be used when you have many days to
+be updated. The second one should be used only for particular cases, where the
+days to be updated are a few and isolated.</p>
+<p>If you want to make your life way easier by electing a unique function to be used
+for your updates, please choose the <em>update_avail()</em> call. Why? It
+will often happen to send big updates (for example 1 year starting from
+“today” for 10 rooms, 365 * 10= 3650 days). Using update_sparse_avail()
+for these updates would be very very poor and expensive.</p>
+</section>
+<section id="using-update-avail">
+<h2>Using update_avail()<a class="headerlink" href="#using-update-avail" title="Permalink to this heading"></a></h2>
+<p>The <em>update_avail()</em> function takes two trivial arguments (token
+and lcode) and two additional ones: <em>dfrom</em> and <em>rooms</em>. The <em>dfrom</em>
+argument is a date (string, european format).</p>
+<p>Calling update_avail() means that you want to update, starting from
+the <em>dfrom</em> date, an arbitrary number of days for one or multiple rooms.
+Let’s better understand this concept with a “geometrical” example,
+assuming dfrom= 21/12/2021 and that we want to update 3 days starting
+from this date for the rooms with ID= 1 and ID= 2:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Room to update (ID)</p></th>
+<th class="head"><p>First day (21/12)</p></th>
+<th class="head"><p>22/12</p></th>
+<th class="head"><p>23/12</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>{‘avail’: 1}</p></td>
+<td><p>{}</p></td>
+<td><p>{‘no_ota’: 0}</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>{‘no_ota’: 1 ‘avail’: 1}</p></td>
+<td><p>{}</p></td>
+<td><p>{}</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>As you can guess, the representation of one day is very flexible. You can
+selectively update values, modifying the parameters <em>avail</em>, <em>no_ota</em>,
+<em>both</em> or <em>nothing</em>. By considering this flexibility, you can also
+understand that using <em>update_sparse_avail()</em> can be skipped,
+due to the fact that <em>update_avail()</em> already provides the
+possibility to update only few days inside a range of dates.</p>
+<p>If you correctly understand the logic of the information that has to be sent, it will be easy to understand
+the following data structure:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># We have an array, each element representing a room</span>
+<span class="n">roomdays</span><span class="o">=</span> <span class="p">[</span>
+  <span class="c1"># The first room:</span>
+  <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;avail&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{},</span> <span class="p">{</span><span class="s1">&#39;no_ota&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}],</span>
+  <span class="c1"># The second room:</span>
+  <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;no_ota&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;avail&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{},</span> <span class="p">{}],</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Notice that all arrays have the same length. Use an empty day to eventually
+fit shorter arrays.</p>
+</div>
+<p>In other words, the <em>rooms</em> parameter is an array. Each element is a KV strcuture
+having the following keys: <strong>id</strong> (the ID of the room) and <strong>days</strong> (daily values).
+The <strong>days</strong> key is used to provide an array of daily values, like this one:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;avail&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;no_ota&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Which is, in xml:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;struct&gt;</span>
+<span class="w">  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">    </span><span class="nt">&lt;name&gt;</span>avail<span class="nt">&lt;/name&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">  </span><span class="nt">&lt;member&gt;</span>
+<span class="w">    </span><span class="nt">&lt;name&gt;</span>no_ota<span class="nt">&lt;/name&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;&lt;/value&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/member&gt;</span>
+<span class="nt">&lt;/struct&gt;</span>
+</pre></div>
+</div>
+<p>Always considering the previous example, this is the array
+for the Room with ID= 2:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;array&gt;</span>
+<span class="w">  </span><span class="nt">&lt;data&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;</span><span class="w">   </span><span class="cm">&lt;!-- the first day --&gt;</span>
+<span class="w">      </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">        </span><span class="nt">&lt;member&gt;</span>
+<span class="w">          </span><span class="nt">&lt;name&gt;</span>avail<span class="nt">&lt;/name&gt;</span>
+<span class="w">          </span><span class="nt">&lt;value&gt;</span>
+<span class="w">            </span><span class="nt">&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">        </span><span class="nt">&lt;member&gt;</span>
+<span class="w">          </span><span class="nt">&lt;name&gt;</span>no_ota<span class="nt">&lt;/name&gt;</span>
+<span class="w">          </span><span class="nt">&lt;value&gt;</span>
+<span class="w">            </span><span class="nt">&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;</span><span class="w">  </span><span class="cm">&lt;!-- the second day --&gt;</span>
+<span class="w">      </span><span class="nt">&lt;struct&gt;&lt;/struct&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;value&gt;</span><span class="w">  </span><span class="cm">&lt;!-- the third day --&gt;</span>
+<span class="w">      </span><span class="nt">&lt;struct&gt;&lt;/struct&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/data&gt;</span>
+<span class="nt">&lt;/array&gt;</span>
+</pre></div>
+</div>
+<p>Finally, click on the following link for a full representation of the update call
+described on our example.</p>
+<script type="text/javascript">
+    function showhide(element){
+        if (!document.getElementById)
+            return
+
+        if (element.style.display == "block")
+            element.style.display = "none"
+        else
+            element.style.display = "block"
+    };
+</script>
+<a href="javascript:showhide(document.getElementById('hiddencodeblock5'))">+ show/hide code</a><br /><div id="hiddencodeblock5" style="display: none"><div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;methodCall&gt;</span>
+<span class="w">  </span><span class="nt">&lt;methodName&gt;</span>update_avail<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;string&gt;</span>9180470392.3814<span class="nt">&lt;/string&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>1213394817<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;string&gt;</span>25/06/2015<span class="nt">&lt;/string&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;array&gt;</span>
+<span class="w">          </span><span class="nt">&lt;data&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>id<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;int&gt;</span>1<span class="nt">&lt;/int&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>days<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;array&gt;</span>
+<span class="w">                      </span><span class="nt">&lt;data&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                          </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;name&gt;</span>avail<span class="nt">&lt;/name&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                                </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;name&gt;</span>no_ota<span class="nt">&lt;/name&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                                </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                          </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                      </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodCall&gt;</span>
+</pre></div>
+</div>
+</div></section>
+<section id="sparse-updates-using-update-sparse-avail">
+<h2>Sparse updates ( using update_sparse_avail() )<a class="headerlink" href="#sparse-updates-using-update-sparse-avail" title="Permalink to this heading"></a></h2>
+<p>This function is very, very, very similar to the previous one. The structure you
+must send is equal, but each Day Representation contains an additional field:
+<em>date</em>. That’s an example to better understand its logic:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;methodCall&gt;</span>
+<span class="w">  </span><span class="nt">&lt;methodName&gt;</span>update_sparse_avail<span class="nt">&lt;/methodName&gt;</span>
+<span class="w">  </span><span class="nt">&lt;params&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;string&gt;</span>1111111111.1111<span class="nt">&lt;/string&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;int&gt;</span>5555555555<span class="nt">&lt;/int&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">    </span><span class="nt">&lt;param&gt;</span>
+<span class="w">      </span><span class="nt">&lt;value&gt;</span>
+<span class="w">        </span><span class="nt">&lt;array&gt;</span>
+<span class="w">          </span><span class="nt">&lt;data&gt;</span>
+<span class="w">            </span><span class="nt">&lt;value&gt;</span>
+<span class="w">              </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>id<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;string&gt;</span>1<span class="nt">&lt;/string&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;name&gt;</span>days<span class="nt">&lt;/name&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;array&gt;</span>
+<span class="w">                      </span><span class="nt">&lt;data&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                          </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;name&gt;</span>avail<span class="nt">&lt;/name&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                                </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;name&gt;</span>date<span class="nt">&lt;/name&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                                </span><span class="nt">&lt;string&gt;</span>27/11/2016<span class="nt">&lt;/string&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;name&gt;</span>no_ota<span class="nt">&lt;/name&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                                </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                          </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                          </span><span class="nt">&lt;struct&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;name&gt;</span>avail<span class="nt">&lt;/name&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                                </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;name&gt;</span>date<span class="nt">&lt;/name&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                                </span><span class="nt">&lt;string&gt;</span>27/11/2016<span class="nt">&lt;/string&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;member&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;name&gt;</span>no_ota<span class="nt">&lt;/name&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;value&gt;</span>
+<span class="w">                                </span><span class="nt">&lt;int&gt;</span>0<span class="nt">&lt;/int&gt;</span>
+<span class="w">                              </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                            </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">                          </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">                        </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                      </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">                    </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">                  </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">                </span><span class="nt">&lt;/member&gt;</span>
+<span class="w">              </span><span class="nt">&lt;/struct&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">          </span><span class="nt">&lt;/data&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/array&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/value&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/param&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/params&gt;</span>
+<span class="nt">&lt;/methodCall&gt;</span>
+</pre></div>
+</div>
+<p>As you guess, each Array contains an arbitrary number of days to be updated. Each
+day representation must have a <em>date</em> parameter.</p>
+</section>
+<section id="reading-current-values">
+<h2>Reading current values<a class="headerlink" href="#reading-current-values" title="Permalink to this heading"></a></h2>
+<p>It’s also possible to read current values of your rooms. The following call
+returns them given a range of dates:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="fetch_rooms_values">
+<span class="sig-name descname"><span class="pre">fetch_rooms_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lcode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dto</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">rooms</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#fetch_rooms_values" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>The optional argument <strong>rooms</strong> is an array of Room IDs, to be used if you
+are just interested on a specific set of rooms. When not passed, this function
+returns values of all of your rooms (as a KV structure).</p>
+<p>Notice there is a limit on dates: the server will not accept dates too far
+in the future (limit is 2 years).</p>
+<p>For each room and for each day, you will have the following values (notice
+that the following example returns values for the room with ID= 1):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s1">&#39;closed_arrival&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;booked&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;max_stay&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">69.0</span><span class="p">,</span>
+      <span class="s1">&#39;min_stay&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;closed_departure&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;avail&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s1">&#39;closed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;min_stay_arrival&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;no_ota&#39;</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s1">&#39;closed_arrival&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;booked&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;max_stay&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mf">69.0</span><span class="p">,</span>
+      <span class="s1">&#39;min_stay&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;closed_departure&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;avail&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s1">&#39;closed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;min_stay_arrival&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s1">&#39;no_ota&#39;</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>this function also returns prices/restrictions. You should ignore
+these values. To read prices and restrictions, please, read the
+following chapters (<a class="reference internal" href="prices.html"><span class="doc">Handling Prices</span></a> and <a class="reference internal" href="rstrs.html"><span class="doc">Handling Restrictions</span></a>). By the way,
+the returned restrictions are the Standard Restrictions.
+The prices are related to the WuBook Parity (unless you modify it,
+linking the WuBook Parity to a specific pricing plan).</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rooms.html" class="btn btn-neutral float-left" title="Handling Rooms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="prices.html" class="btn btn-neutral float-right" title="Handling Prices" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, WuBook.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+<!--<div style="margin-left:620px">-->
+<!--<a style="color:red" href="http://en.wubook.net">WuBook Website</a> -->
+<!--<style>-->
+<!--.descname {-->
+        <!--color: #E69138;-->
+        <!--}-->
+        <!--div.note {-->
+                <!--background-color: #ddffd1;-->
+                <!--}-->
+                <!--.sphinxsidebarwrapper_zzz {-->
+                        <!--border-right: 1px solid #999999;-->
+                        <!--}-->
+                        <!--h1 {-->
+                                <!--font-size: 180% !important;-->
+                                <!--color: #db0000 !important;-->
+                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                <!--}-->
+                                <!--h2 {-->
+                                        <!--font-size: 160% !important;-->
+                                        <!--color: #db0000 !important;-->
+                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                        <!--}-->
+                                        <!--p {-->
+                                                <!--font-size: 110% !important;-->
+                                                <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                <!--color: #3E4349-->
+                                                <!--}-->
+                                                <!--div.body {-->
+                                                        <!--font-size: 110% !important;-->
+                                                        <!--font-family: 'Baskerville', 'Georgia', serif;-->
+                                                        <!--color: #3E4349-->
+                                                        <!--}-->
+                                                        <!--</style>-->
+<!--</div>-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-4959530-27', 'auto');
+    ga('set', 'anonymizeIp', true);
+    ga('send', 'pageview');
+</script>
+   
+
+
+</body>
+</html>

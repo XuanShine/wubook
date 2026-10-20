@@ -1,0 +1,1019 @@
+
+
+
+
+[[handling-rooms]]
+
+Handling Rooms
+
+[[introduction]]
+
+Introduction
+
+This chapter is the right piece of documentation if you want to add, modify
+and remove rooms. There are two kind of rooms:
+
+Standard room
+
+Virtual rooms
+
+Virtual rooms are always associated to a Standard Room and inherit its
+availability. At the same time, they have indipendent restrictions and
+prices, occupancies and meal options (boards settings).
+
+Each room has a set of default values, which are globally applied (applied for
+each day of each year) until you override them depending on the dates.
+
+Rooms can be WooDoo Only: when a room is WooDoo Only, this room is
+not sold on the WooDoo Online Reception (booking engine).
+
+Finally, WuBook supports the Anchorage feature: the prices of one room
+can be inherited by another room and altered by a static or percentage
+variation.
+
+[[fetching-existing-rooms]]
+
+Fetching existing rooms
+
+To retrieve the rooms of one property, you can use one of the following functions:
+
+[[fetch_rooms]]
+
+fetch_rooms(token, lcode, ancillary=0)
+
+fetch_rooms returns a list of rooms
+
+[[fetch_single_room]]
+
+fetch_single_room(token, lcode, rid, ancillary=0)
+
+fetch_single_room returns just the requested room.
+
+Rooms returned by these functions are represented by a Key->Value structure.
+Each structure having the following keys:
+
+id: the id of the room (what else?)
+
+name: the main name of the room.
+
+shortname: the room shortname: unique (per property)
+
+occupancy: the room occupancy
+
+men: adults (note: adults + children = occupancy)
+
+children: children (note: adults + children = occupancy)
+
+subroom: if the room is virtual, this field is the id of the Parent Room (0 otherwise)
+
+anchorate: price anchorage. The field contains the Parent Room (0 otherwise)
+
+price: the default price for this room
+
+availability: the default availability
+
+board: the default board (WooDoo Online Reception only)
+
+boards: other optional boards (WooDoo Online Reception only)
+
+woodoo: is that room woodoo only? (not sellable on the booking engine and Fount (TripAdvisor, Trivago and so on))
+
+dec_avail: availability to be decreased in Parent Room
+
+min_price: the minimun price for this room (If passed, must be greater to or equal to 5. Otherwise defalt values is 0)
+
+max_price: the maximun price for this room (If passed, must be greater to or equal to 5. Otherwise defalt values is 0)
+
+rtype: rtype ID (room, apartment and so on)
+
+rtype_name: rtype name (rtype human description)
+
+Warning
+
+if a room is virtual, sending availability is useless. The availability is inherited from
+its Parent Room
+
+Warning
+
+if a room has a price anchorage, updating prices is useless. Prices are inherited from its
+Parent Room
+
+Note
+
+a room can at the same time be virtual and having a price anchorage. The Parent Room for its
+availability can be different from the Parent Room of its price.
+
+Note
+
+with ancillary = 1 will be returned also description and name of the room for each language
+(just if previously set)
+
+Here is an example of a fetch rooms request followed by the answer.
+
++ show/hide code
+[[hiddencodeblock2]]
+
+  <methodCall>
+    <methodName>fetch_rooms</methodName>
+    <params>
+      <param>
+        <value><string>1238200946.2025</string></value>
+      </param>
+      <param>
+        <value><int>1213394817</int></value>
+      </param>
+    </params>
+  </methodCall>
+
+  <---------------response--------------->
+
+  <methodResponse>
+    <params>
+      <param>
+        <value>
+          <array><data>
+
+            <value><int>0</int></value>
+
+            <value>
+              <array><data>
+
+                <value><struct>
+                  <member>
+                    <name>name</name>
+                    <value><string>Romeo</string></value>
+                  </member>
+                  <member>
+                    <name>men</name>
+                    <value><int>2</int></value>
+                  </member>
+                  <member>
+                    <name>subroom</name>
+                    <value><int>0</int></value>
+                  </member>
+                  <member>
+                    <name>occupancy</name>
+                    <value><int>2</int></value>
+                  </member>
+                  <member>
+                    <name>id</name>
+                    <value><int>1</int></value>
+                  </member>
+                  <member>
+                    <name>shortname</name>
+                    <value><string>Rom</string></value>
+                  </member>
+                  <member>
+                    <name>children</name>
+                    <value><int>0</int></value>
+                  </member>
+                </struct></value>
+
+                <value><struct>
+                  <member>
+                    <name>name</name>
+                    <value><string>Romeo single usage</string></value>
+                  </member>
+                  <member>
+                    <name>men</name>
+                    <value><int>2</int></value>
+                  </member>
+                  <member>
+                    <name>subroom</name>
+                    <value><int>1</int></value>
+                  </member>
+                  <member>
+                    <name>occupancy</name>
+                    <value><int>1</int></value>
+                  </member>
+                  <member>
+                    <name>id</name>
+                    <value><int>2</int></value>
+                  </member>
+                  <member>
+                    <name>shortname</name>
+                    <value><string>rom1</string></value>
+                  </member>
+                  <member>
+                    <name>children</name>
+                    <value><int>0</int></value>
+                  </member>
+                </struct></value>
+
+              </data></array>
+            </value>
+          </data></array>
+        </value>
+      </param>
+    </params>
+
+[[adding-a-new-room]]
+
+Adding a new room
+
+To add a room, you have two functions (depending on the nature of the room, standard or virtual):
+
+[[new_room]]
+
+new_room(token, lcode, woodoo, name, beds, defprice, avail, shortname, defboard[, names, descriptions, boards, rtype, min_price, max_price])
+
+[[new_virtual_room]]
+
+new_virtual_room(token, lcode, rid, woodoo, name, beds, children, defprice, shortname, defboard[, names, descriptions, boards, dec_avail, min_price, max_price])
+
+Both return the assigned ID of the new room. Let’s discuss the not trivial parameters:
+
+woodoo: if 1, this room will be WooDoo only
+
+shortame: maximum 4 chars. For the same property, use different shortnames for different rooms
+
+defboard: it can be bb (breakfast), fb (full board), hb (half board), nb (no board) and ai (all inclusive)
+
+names: used to provide a name of the room for each language (booking engine). KV struct, like: {‘en’: ‘Double’, ‘it’: ‘Doppia’}
+
+descriptions: as names
+
+rtype: type of the product (1: Room; 2: Apartment; 3: Bed; 4: Unit; 5: Bungalow; 6: Tent; 7: Villa; 8: Chalet; 9: RV park)
+
+boards: optional and only useful for the Online Reception (booking engine). Details follow.
+
+beds: the occupancy of the rooms (children included)
+
+children: the number of allowed children (if 1 and beds= 2, the occupancy is 1 Adult + 1 Child)
+
+dec_avail: availability to be decreased in Parent Room
+
+min_price: the minimun price for this room (If passed, must be greater to or equal to 5. Otherwise defalt values is 0)
+
+max_price: the maximun price for this room (If passed, must be greater to or equal to 5. Otherwise defalt values is 0)
+
+Notice that in order to add a virtual room the rid argument is necessary: this is the
+identifier of the Parent Room.
+
+Before understanding the boards parameter as Data Type, let’s see how
+it works. First of all, this information is only used on the Booking
+engine. So, for example, if the room is WooDoo Only, this information is completely
+useless.
+
+The WooDoo Online Reception (booking engine) can propose different prices for the same
+room depending on the selected meal option (if multiple options are provided,
+otherwise, it’s always sold with the standard board).
+
+Providing multiple meal options is possible and can be done by defining a price
+variation. For example, a double, sold with a breakfast option by default,
+can be sold with an increase of 10 EUR when the Half Board option is selected.
+
+So, a meal option is a variation of the room price. And the variation can be static
+(+/- N EUR) or defined in percentage (+/- N%). The parameter defining the variation
+is called dtype and can assume the following values:
+
+Value
+
+Meaning
+
+2
+
+Static increase
+
+1
+
+Percentage increase
+
+-1
+
+Percentage decrease
+
+-2
+
+Static decrease
+
+This being said, let’s analyze the boards parameter. It is a complex KV struct,
+representing this logic. Let’s check an example:
+
+boards= {'hb': {'dtype': 1, 'value': 10}, 'fb': {'dtype': 2, 'value': 20}}
+
+Suppose that, for the day X, the room price (related to the default
+meal option) is 100. With the previous example, the room sold with an
+Half Board option would cost 110 (percentage variation, hb). The same room,
+sold in Full Board option would cost instead 120 (static increase for fb).
+
+Let’s also report an xml representation of the previous KV struct:
+
+<value>
+  <struct>
+    <member>
+      <name>hb</name>
+      <value>
+        <struct>
+          <member>
+            <name>dtype</name>
+            <value>
+              <int>1</int>
+            </value>
+          </member>
+          <member>
+            <name>value</name>
+            <value>
+              <int>10</int>
+            </value>
+          </member>
+        </struct>
+      </value>
+    </member>
+    <member>
+      <name>fb</name>
+      <value>
+        <struct>
+          <member>
+            <name>dtype</name>
+            <value>
+              <int>2</int>
+            </value>
+          </member>
+          <member>
+            <name>value</name>
+            <value>
+              <int>20</int>
+            </value>
+          </member>
+        </struct>
+      </value>
+    </member>
+  </struct>
+</value>
+
+Finally, let’s check a full new_room() example: click on the following link
+to review it!
+
++ show/hide code
+[[hiddencodeblock3]]
+
+<methodCall>
+  <methodName>new_room</methodName>
+  <params>
+    <param>
+      <value>
+        <string>9516736649.5172</string>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>1213394817</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>1</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <string>NewRoom</string>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>10</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>1000</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>1000</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <string>NeC</string>
+      </value>
+    </param>
+    <param>
+      <value>
+        <string>nb</string>
+      </value>
+    </param>
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>ru</name>
+            <value>
+              <string>russian name</string>
+            </value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>ru</name>
+            <value>
+              <string>russian description</string>
+            </value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>bb</name>
+            <value>
+              <struct>
+                <member>
+                  <name>dtype</name>
+                  <value>
+                    <int>1</int>
+                  </value>
+                </member>
+                <member>
+                  <name>value</name>
+                  <value>
+                    <int>10</int>
+                  </value>
+                </member>
+              </struct>
+            </value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>3</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>0</int>
+      </value>
+    </param>
+    <param>
+      <value>
+        <int>120</int>
+      </value>
+    </param>
+  </params>
+</methodCall>
+
+And here is an example of the answer.
+
++ show/hide code
+[[hiddencodeblock4]]
+
+  <params>
+    <param>
+      <value>
+        <array>
+          <data>
+            <value>
+              <int>0</int>
+            </value>
+            <value>
+              <int>1000</int>
+            </value>
+          </data>
+        </array>
+      </value>
+    </param>
+
+[[modifying-a-room]]
+
+Modifying a room
+
+As for adding new rooms, we have two available procedures to modify existing rooms:
+
+[[mod_room]]
+
+mod_room(token, lcode, rid, name, beds, defprice, avail, shortname, defboard[, names, descriptions, boards, min_price, max_price, rtype, woodoo_only])
+
+Below you’ll find an example of a request and a response.
+
++ show/hide code
+[[hiddencodeblock5]]
+
+<methodCall>
+  <methodName>mod_room</methodName>
+  <params>
+    <param>
+      <value><string>9990289972.1552</string></value>
+    </param>
+    <param>
+      <value><int>1213394817</int></value>
+    </param>
+    <param>
+      <value><int>24438</int></value>
+    </param>
+    <param>
+      <value><string>Double room</string></value>
+    </param>
+    <param>
+      <value><int>2</int></value>
+    </param>
+    <param>
+    <value>
+      <double>42.0</double>
+    </value>
+    </param>
+    <param>
+      <value><int>5</int></value>
+    </param>
+    <param>
+      <value><string>DB</string></value>
+    </param>
+    <param>
+      <value><string>nb</string></value>
+    </param>
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>it</name>
+            <value><string>Camera doppia</string></value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>en</name>
+            <value><string>Description of the room</string></value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>hb</name>
+            <value>
+              <struct>
+                <member>
+                  <name>dtype</name>
+                  <value><int>1</int></value>
+                </member>
+                <member>
+                  <name>value</name>
+                  <value><int>10</int></value>
+                </member>
+              </struct>
+            </value>
+          </member>
+          <member>
+            <name>fb</name>
+            <value>
+              <struct>
+                <member>
+                  <name>dtype</name>
+                  <value><int>2</int></value>
+                </member>
+                <member>
+                  <name>value</name>
+                  <value><int>20</int></value>
+                </member>
+              </struct>
+            </value>
+          </member>
+        </struct>
+      </value>
+    </param>
+    <param>
+      <value><double>10.0</double></value>
+    </param>
+    <param>
+      <value><double>1000.0</double></value>
+    </param>
+    <param>
+      <value><int>1</int></value>
+    </param>
+    <param>
+      <value><int>0</int></value>
+    </param>
+  </params>
+</methodCall>
+
+<!----------------- answer ----------->
+<methodResponse>
+  <params>
+    <param>
+      <value>
+        <array>
+          <data>
+            <value><int>0</int></value>
+            <value><int>24438</int></value>
+          </data>
+        </array>
+      </value>
+    </param>
+  </params>
+</methodResponse>
+
+[[mod_virtual_room]]
+
+mod_virtual_room(token, lcode, rid, name, beds, children, defprice, short, defboard[, names, descriptions, boards, dec_avail, min_price, max_price, woodoo_only])
+
+To understand the meaning of the arguments, check the following example of a call followed by a response.
+
++ show/hide code
+[[hiddencodeblock6]]
+
+  <methodCall>
+    <methodName>mod_virtual_room</methodName>
+    <params>
+      <param>
+        <value>
+          <string>1374667085.8467</string>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>1213394817</int>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>34668</int>
+        </value>
+      </param>
+      <param>
+        <value>
+          <string>Family</string>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>3</int>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>1</int>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>80</int>
+        </value>
+      </param>
+      <param>
+        <value>
+          <string>MTRD</string>
+        </value>
+      </param>
+      <param>
+        <value>
+          <string>hb</string>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>0</int>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>0</int>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>120</int>
+        </value>
+      </param>
+    </params>
+
+    <-----------------answer----------->
+  <params>
+    <param>
+      <value>
+        <array>
+          <data>
+            <value>
+              <int>0</int>
+            </value>
+            <value>
+              <int>34668</int>
+            </value>
+          </data>
+        </array>
+      </value>
+    </param>
+
+[[removing-a-room]]
+
+Removing a room
+
+Deleting a room is very easy:
+
+[[del_room]]
+
+del_room(token, lcode, rid)
+
+Here is an example of del_room() call followed by its answer.
+
++ show/hide code
+[[hiddencodeblock7]]
+
+  <methodCall>
+    <methodName>del_room</methodName>
+    <params>
+      <param>
+        <value>
+          <string>9940098773.3035</string>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>1213394817</int>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>99318</int>
+        </value>
+      </param>
+    </params>
+    </methodCall>
+
+    <-----------------response--------->
+
+  <methodResponse>
+    <params>
+      <param>
+        <value>
+          <array>
+            <data>
+              <value>
+                <int>0</int>
+              </value>
+              <value>
+                <int>0</int>
+              </value>
+            </data>
+          </array>
+        </value>
+      </param>
+    </params>
+
+[[other-functions]]
+
+Other functions
+
+The following functions can be useful:
+
+[[room_images]]
+
+room_images(token. lcode, rid)
+
+room_images() returns a list of images for the room identified by rid.
+Each image is a struct containing an url (image_link) and a flag main_image (1 or 0).
+When main_image is 1, that’s  the default image of the room (and other images should be considered additional).
+
+The following is an example of the room_images() call followed by the response.
+
++ show/hide code
+[[hiddencodeblock8]]
+
+  <methodCall>
+    <methodName>room_images</methodName>
+    <params>
+      <param>
+        <value>
+          <string>1322234714.0089</string>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>1213394817</int>
+        </value>
+      </param>
+      <param>
+        <value>
+          <int>3069</int>
+        </value>
+      </param>
+    </params>
+  </methodCall>
+
+  <-----------------------response------------->
+
+  <methodResponse>
+    <params>
+      <param>
+        <value>
+          <array>
+            <data>
+               <value>
+                 <int>0</int>
+               </value>
+               <value>
+                 <array>
+                   <data>
+                     <value>
+                       <struct>
+                         <member>
+                           <name>id_room</name>
+                           <value>
+                             <int>1</int>
+                           </value>
+                         </member>
+                         <member>
+                           <name>image_link</name>
+                           <value>
+                             <string>https://wubook.net/wbk/imgs/room/3609.png</string>
+                           </value>
+                         </member>
+                         <member>
+                           <name>main_image</name>
+                           <value>
+                             <int>0</int>
+                           </value>
+                         </member>
+                       </struct>
+                     </value>
+                   </data>
+                 </array>
+               </value>
+            </data>
+          </array>
+        </value>
+      </param>
+    </params>
+  </methodResponse>
+
+[[update-functions]]
+
+Update Functions
+
+[[push_update_activation]]
+
+push_update_activation(token, lcode, url)
+
+Wired can send a notification if rooms values are changed, for instance when a user updates the availability of his rooms on WooDoo Extranet.
+The push_update_activation() method is used to setup an URL to which the notifications will be sent.
+A notification is very simple, it’s just a POST with three parameters: lcode, dfrom, dto. By default, the URL configured for Update
+Notifications is empty and it means that no notification will be sent. By setting up a right URL, notifications will be sent.
+To disable the Update Notification System, just use url= “” (empty string).
+
+This function is very important if you use Wired to develop your own Booking Engine. It allows to set a reliable cache system on your side.
+The logic behind it is: you periodically download rooms values by using Wired functions (like fetch_rooms_values() and plans functions) and then, when
+you receive a PushUpdate notification, you know that your data must be refreshed for a specified range of dates.
+
+Here is an example of a request and an answer:
+
++ show/hide code
+[[hiddencodeblock9]]
+
+<methodCall>
+<methodName>push_update_activation</methodName>
+<params>
+<param>
+<value>
+<string>9222557560.2196</string>
+</value>
+</param>
+<param>
+<value>
+<int>1213394817</int>
+</value>
+</param>
+<param>
+<value>
+<string>http://wikipedia.com</string>
+</value>
+</param>
+</params>
+</methodCall>
+
+<methodResponse>
+<params>
+<param>
+<value>
+<array>
+<data>
+<value>
+<int>0</int>
+</value>
+<value>
+<string>Ok</string>
+</value>
+</data>
+</array>
+</value>
+</param>
+</params>
+</methodResponse>
+
+[[push_update_url]]
+
+push_update_url(token, lcode)
+
+While the previous function allows to set the url, this one simply returns the url used of that lcode.
+
+Here is an example of a request and an answer:
+
++ show/hide code
+[[hiddencodeblock10]]
+
+<methodCall>
+<methodName>push_update_url</methodName>
+<params>
+<param>
+<value>
+<string>9222557560.2196</string>
+</value>
+</param>
+<param>
+<value>
+<int>1213394817</int>
+</value>
+</param>
+</params>
+</methodCall>
+
+<methodResponse>
+<params>
+<param>
+<value>
+<array>
+<data>
+<value>
+<int>0</int>
+</value>
+<value>
+<string>http://wikipedia.com</string>
+</value>
+</data>
+</array>
+</value>
+</param>
+</params>
+
+
+
+
+         Previous
+        Next
+
+
+
+
+
+
+© Copyright 2020, WuBook.
+
+
+
+  Built with Sphinx using a
+    theme
+    provided by Read the Docs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
