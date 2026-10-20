@@ -118,3 +118,4 @@ docker-compose.override.yml
 .env.staging
 
 receipts.json
+.booking-ledger/
