@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+import html
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
 from pathlib import Path
 from typing import Mapping, assert_never
+from urllib.parse import parse_qs
 from uuid import uuid4
 
 import yaml
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 
+from booking.http import create_app
 from booking.model import (
     Cents,
     ClosedArrival,
@@ -107,6 +112,7 @@ class ChoosingExtras:
     catalog: tuple[Extra, ...]
     selected: tuple[str, ...]
     notice: str = ""
+    draft: ContactDraft = field(default_factory=lambda: ContactDraft())
 
 
 @dataclass(frozen=True)
@@ -547,9 +553,18 @@ def _back(
             _posted_key(fields),
             retry=_posted_key(fields) is not None,
         )
+    if _posted_key(fields) is None:
+        return _echo(fields)
     ready = _ready(fields, catalog, hidden)
     if isinstance(ready, _Ready):
-        return _at_extras(ready.stay, ready.room_id, ready.room_name, catalog, ready.selected)
+        return _at_extras(
+            ready.stay,
+            ready.room_id,
+            ready.room_name,
+            catalog,
+            ready.selected,
+            draft=ready.draft,
+        )
     if isinstance(ready, ChoosingRoom):
         return _echo(fields)
     return ready
@@ -604,10 +619,11 @@ def _at_extras(
     catalog: tuple[Extra, ...],
     selected: tuple[str, ...],
     notice: str = "",
+    draft: ContactDraft | None = None,
 ) -> ChoosingExtras:
     if notice == "" and not catalog:
         notice = _EMPTY_EXTRAS
-    return ChoosingExtras(stay, room_id, room_name, catalog, selected, notice)
+    return ChoosingExtras(stay, room_id, room_name, catalog, selected, notice, draft or ContactDraft())
 
 
 def _stay(fields: dict[str, tuple[str, ...]]) -> Stay | tuple[str, ...]:
@@ -753,3 +769,537 @@ def _echo(fields: dict[str, tuple[str, ...]], errors: tuple[str, ...] = ()) -> A
         _first(fields, "adults") if "adults" in fields else "2",
         _first(fields, "children") if "children" in fields else "0",
     )
+
+
+_MONTHS = (
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre",
+)
+_STEPS = ("Dates", "Chambres", "Extras", "Coordonnées", "Confirmation")
+_STYLE = """
+:root {
+  --bg: #f3efe6;
+  --ink: #1e2a24;
+  --pine: #1f4d3a;
+  --brass: #a6844a;
+  --card: #fffcf7;
+  --error: #8f2d2d;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  line-height: 1.45;
+}
+.wrap { max-width: 72rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+.where {
+  margin: 0 0 0.35rem;
+  color: var(--brass);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+.hotel {
+  margin: 0;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 3.1rem;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+.lead { max-width: 38rem; margin: 0.8rem 0 0; }
+.rule { height: 1px; margin: 1.2rem 0 1.4rem; border: 0; background: var(--brass); }
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin: 0 0 1.6rem;
+  padding: 0;
+  list-style: none;
+}
+.steps li {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #667068;
+  border-bottom: 2px solid transparent;
+}
+.steps li span {
+  width: 1.6rem;
+  height: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.8rem;
+}
+.steps .done { color: var(--ink); }
+.steps [aria-current="step"] { color: var(--pine); border-bottom-color: var(--brass); font-weight: 600; }
+.panel {
+  background: var(--card);
+  border: 1px solid #e6dcc8;
+  border-radius: 18px;
+  padding: 1.4rem 1.3rem 1.5rem;
+}
+.panel h2 {
+  margin: 0 0 0.9rem;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 2rem;
+  font-weight: 500;
+}
+.dates, .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+.rooms { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+label { display: block; margin-bottom: 0.85rem; }
+.label { display: block; margin-bottom: 0.35rem; }
+input, select, textarea, button { font: inherit; color: inherit; }
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"],
+input[type="time"], input[type="number"], textarea, button { min-height: 48px; }
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"],
+input[type="time"], input[type="number"], textarea {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #d9d0c0;
+  border-radius: 12px;
+  background: #fff;
+}
+textarea { min-height: 7.5rem; resize: vertical; }
+button { padding: 0 1.3rem; border-radius: 999px; cursor: pointer; }
+button.primary { background: var(--pine); color: var(--card); border: 0; }
+button.secondary { background: transparent; color: var(--pine); border: 1px solid var(--pine); }
+.actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.4rem; }
+.card {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 1.1rem 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.card h3 {
+  margin: 0;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+.price { margin: 0.45rem 0; color: var(--pine); font-size: 1.45rem; }
+.meta { margin: 0; color: #3d4a43; }
+.error { color: var(--error); margin: 0 0 0.8rem; }
+.quiet { margin: 0 0 1rem; }
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 48px;
+  margin: 0 0 0.35rem;
+}
+.check input { width: 48px; height: 48px; min-height: 48px; accent-color: var(--pine); }
+.code {
+  margin: 0.2rem 0 1rem;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 2.4rem;
+}
+a { color: var(--pine); text-underline-offset: 0.18em; }
+input:focus, textarea:focus, button:focus { outline: 2px solid var(--brass); outline-offset: 2px; }
+@media (max-width: 700px) {
+  .rooms, .dates, .pair { grid-template-columns: 1fr; }
+  button.primary { width: 100%; }
+  .hotel { font-size: 2.35rem; }
+  .wrap { padding-top: 1.3rem; }
+}
+"""
+
+
+def render(state: Wizard) -> str:
+    return _document(_step_number(state), _main(state))
+
+
+def guest_app(
+    counter: Counter,
+    extras_path: Path | None = None,
+    rooms_path: Path | None = None,
+) -> FastAPI:
+    catalog = load_extras(extras_path)
+    hidden = hide_rooms(rooms_path)
+    app = create_app(counter)
+
+    @app.get("/")
+    def guest_home() -> HTMLResponse:
+        return HTMLResponse(render(AskingStay()))
+
+    @app.post("/sejour")
+    async def guest_stay(request: Request) -> HTMLResponse:
+        form = parse_qs((await request.body()).decode("utf-8", errors="replace"), keep_blank_values=True)
+        try:
+            state = step(counter, form, date.today(), catalog=catalog, hidden=hidden)
+        except (WiredDown, WireShape, WiredRejected) as exc:
+            state = _wire_stay(exc)
+        return HTMLResponse(render(state))
+
+    return app
+
+
+def _wire_stay(exc: WiredDown | WireShape | WiredRejected) -> AskingStay:
+    if isinstance(exc, WiredRejected):
+        message = exc.message.strip()
+        if message == "":
+            return AskingStay((_REJECTED,))
+        return AskingStay((_REJECTED, message))
+    if isinstance(exc, WireShape):
+        return AskingStay((_SHAPE,))
+    return AskingStay((_DOWN,))
+
+
+def _document(current: int, main: str) -> str:
+    return (
+        "<!DOCTYPE html>"
+        '<html lang="fr">'
+        "<head>"
+        '<meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        "<title>Hôtel Panorama, Grasse</title>"
+        f"<style>{_STYLE}</style>"
+        "</head>"
+        "<body>"
+        '<div class="wrap">'
+        '<p class="where">Grasse</p>'
+        '<h1 class="hotel">Hôtel Panorama</h1>'
+        '<p class="lead">Réservez une chambre pour votre séjour. '
+        "Le petit-déjeuner, le parking et le lit bébé se règlent à l'hôtel.</p>"
+        '<hr class="rule">'
+        f"{_step_list(current)}"
+        f'<div class="panel">{main}</div>'
+        "</div>"
+        "</body>"
+        "</html>"
+    )
+
+
+def _step_number(state: Wizard) -> int:
+    if isinstance(state, AskingStay):
+        return 1
+    if isinstance(state, ChoosingRoom):
+        return 2
+    if isinstance(state, ChoosingExtras):
+        return 3
+    if isinstance(state, AskingContact):
+        return 4
+    return 5
+
+
+def _step_list(current: int) -> str:
+    items: list[str] = []
+    for index, label in enumerate(_STEPS, start=1):
+        if index == current:
+            items.append(f'<li aria-current="step"><span>{index}</span> {_text(label)}</li>')
+        elif index < current:
+            items.append(f'<li class="done"><span>{index}</span> {_text(label)}</li>')
+        else:
+            items.append(f"<li><span>{index}</span> {_text(label)}</li>")
+    return '<ol class="steps">' + "".join(items) + "</ol>"
+
+
+def _main(state: Wizard) -> str:
+    if isinstance(state, AskingStay):
+        return _dates(state)
+    if isinstance(state, ChoosingRoom):
+        return _rooms(state)
+    if isinstance(state, ChoosingExtras):
+        return _extras_page(state)
+    if isinstance(state, AskingContact):
+        return _contact_page(state)
+    if isinstance(state, Done):
+        return _done(state)
+    return _blocked_page(state)
+
+
+def _dates(state: AskingStay) -> str:
+    errors = "".join(_error(item) for item in state.errors)
+    return (
+        "<h2>Vos dates</h2>"
+        f"{errors}"
+        '<form method="post" action="/sejour">'
+        '<div class="dates">'
+        f"{_field('Arrivée', 'check_in', 'date', state.check_in, required=True)}"
+        f"{_field('Départ', 'checkout', 'date', state.checkout, required=True)}"
+        "</div>"
+        '<div class="pair">'
+        f"{_field('Adultes', 'adults', 'number', state.adults, required=True, min_value='1')}"
+        f"{_field('Enfants', 'children', 'number', state.children, required=True, min_value='0')}"
+        "</div>"
+        f'<div class="actions">{_button("Voir les chambres", "stay")}</div>'
+        "</form>"
+    )
+
+
+def _rooms(state: ChoosingRoom) -> str:
+    banner = _error(state.sentence) if state.sentence else ""
+    cards = "".join(_room_card(state, room) for room in state.rooms)
+    back = (
+        '<form method="post" action="/sejour">'
+        f"{''.join(_stay_fields(state.stay))}"
+        f'<div class="actions">{_button("Retour", "back", primary=False)}</div>'
+        "</form>"
+    )
+    return f"<h2>Chambres</h2>{banner}<div class=\"rooms\">{cards}</div>{back}"
+
+
+def _room_card(state: ChoosingRoom, room: BookableRoom) -> str:
+    people = "1 personne" if room.occupancy == 1 else f"{room.occupancy} personnes"
+    nights = "1 nuit" if room.nights == 1 else f"{room.nights} nuits"
+    return (
+        '<form method="post" action="/sejour" class="card">'
+        f"{''.join(_stay_fields(state.stay))}"
+        f"{_h('room_id', int(room.id))}"
+        f"{_h('room_name', room.name)}"
+        f"<h3>{_text(room.name)}</h3>"
+        f'<p class="meta">Jusqu\'à {_text(people)}. {_text(nights)}.</p>'
+        f'<p class="price">{_text(euros(int(room.total_cents)))}</p>'
+        f'<div class="actions">{_button("Choisir", "room")}</div>'
+        "</form>"
+    )
+
+
+def _extras_page(state: ChoosingExtras) -> str:
+    if state.notice == _EMPTY_EXTRAS:
+        note = f'<p class="quiet">{_text(state.notice)}</p>'
+    else:
+        note = _error(state.notice)
+    boxes = "".join(_extra_box(state, extra) for extra in state.catalog)
+    hidden = "".join(_stay_fields(state.stay) + _room_fields(state) + _draft_fields(state.draft))
+    return (
+        "<h2>Extras</h2>"
+        '<p class="quiet">Ces prestations se règlent à l\'hôtel, pas avec la chambre.</p>'
+        f"{note}"
+        '<form method="post" action="/sejour">'
+        f"{hidden}{boxes}"
+        f'<div class="actions">{_button("Continuer", "extras")}</div>'
+        "</form>"
+        '<form method="post" action="/sejour">'
+        f"{''.join(_stay_fields(state.stay))}"
+        f'<div class="actions">{_button("Retour", "back", primary=False)}</div>'
+        "</form>"
+    )
+
+
+def _extra_box(state: ChoosingExtras, extra: Extra) -> str:
+    checked = " checked" if extra.id in state.selected else ""
+    amount = euros(extra.line_cents(state.stay))
+    return (
+        '<label class="check">'
+        f'<input type="checkbox" name="extra" value="{_e(extra.id)}"{checked}>'
+        f"<span>{_text(extra.label)} ({_text(amount)}) à régler à l'hôtel</span>"
+        "</label>"
+    )
+
+
+def _contact_page(state: AskingContact) -> str:
+    errors = dict(state.errors)
+    room = f'<p class="quiet">{_text(state.room_name)}</p>' if state.room_name else ""
+    when = f"{_when(state.stay.check_in)} au {_when(state.stay.checkout)}"
+    extras = _chosen_line(state.catalog, state.selected, state.stay)
+    extra_note = f'<p class="quiet">À régler à l\'hôtel. {_text(extras)}</p>' if extras else ""
+    hidden = "".join(
+        _stay_fields(state.stay) + _room_fields(state) + [_h("extra", item) for item in state.selected] + [_h("key", state.key)]
+    )
+    back_hidden = "".join(
+        _stay_fields(state.stay)
+        + _room_fields(state)
+        + [_h("extra", item) for item in state.selected]
+        + _draft_fields(state.draft)
+        + [_h("key", state.key)]
+    )
+    arrival = _field(
+        "Heure d'arrivée",
+        "arrival_hour",
+        "time",
+        state.draft.arrival_hour,
+        required=True,
+        error=errors.get("arrival_hour", ""),
+    )
+    return (
+        "<h2>Coordonnées</h2>"
+        f'<p class="quiet">{_text(when)}</p>'
+        f"{room}{extra_note}"
+        '<form method="post" action="/sejour">'
+        f"{hidden}"
+        f"{_field('Nom', 'last_name', 'text', state.draft.last_name, required=True, error=errors.get('last_name', ''), complete='family-name')}"
+        f"{_field('Prénom', 'first_name', 'text', state.draft.first_name, required=True, error=errors.get('first_name', ''), complete='given-name')}"
+        f"{_field('E-mail', 'email', 'email', state.draft.email, required=True, error=errors.get('email', ''), complete='email')}"
+        f"{_field('Téléphone', 'phone', 'tel', state.draft.phone, required=True, error=errors.get('phone', ''), complete='tel')}"
+        f"{arrival}"
+        f"{_area('Remarques', 'remarks', state.draft.remarks, errors.get('remarks', ''))}"
+        f'<div class="actions">{_button("Confirmer la réservation", "contact")}</div>'
+        "</form>"
+        '<form method="post" action="/sejour">'
+        f"{back_hidden}"
+        f'<div class="actions">{_button("Retour", "back", primary=False)}</div>'
+        "</form>"
+    )
+
+
+def _done(state: Done) -> str:
+    total = euros(int(state.reservation.total_cents))
+    extras = ""
+    if state.extras:
+        detail = ", ".join(
+            f"{extra.label} ({euros(extra.line_cents(state.stay))})" for extra in state.extras
+        )
+        extras = f'<h3>À régler à l\'hôtel</h3><p>{_text(detail)}</p>'
+    return (
+        "<h2>Réservation confirmée</h2>"
+        "<p>Votre séjour est enregistré.</p>"
+        f'<p class="meta">Code</p><p class="code">{_text(state.reservation.code)}</p>'
+        f'<p class="meta">Montant de la réservation</p><p class="price">{_text(total)}</p>'
+        f"{extras}"
+        f'<p class="quiet">{_text(_when(state.stay.check_in))} au {_text(_when(state.stay.checkout))}. {_text(state.room_name)}</p>'
+        '<p><a href="/">Nouvelle recherche</a></p>'
+    )
+
+
+def _blocked_page(state: Blocked) -> str:
+    wired = _error(state.wired_message) if state.wired_message else ""
+    retry = ""
+    if state.retry and state.key is not None and state.stay is not None and state.room_id is not None:
+        hidden = "".join(
+            _stay_fields(state.stay)
+            + [
+                _h("room_id", int(state.room_id)),
+                _h("room_name", state.room_name),
+                *[_h("extra", item) for item in state.selected],
+                *_draft_fields(state.draft),
+                _h("key", state.key),
+                _h("outcome", state.kind.value),
+            ]
+        )
+        retry = (
+            '<form method="post" action="/sejour">'
+            f"{hidden}"
+            f'<div class="actions">{_button("Réessayer", "retry")}</div>'
+            "</form>"
+        )
+    back = ""
+    if state.allow_back and state.stay is not None and state.room_id is not None and state.key is not None:
+        hidden = "".join(
+            _stay_fields(state.stay)
+            + [
+                _h("room_id", int(state.room_id)),
+                _h("room_name", state.room_name),
+                *[_h("extra", item) for item in state.selected],
+                *_draft_fields(state.draft),
+                _h("key", state.key),
+            ]
+        )
+        back = (
+            '<form method="post" action="/sejour">'
+            f"{hidden}"
+            f'<div class="actions">{_button("Retour", "back", primary=False)}</div>'
+            "</form>"
+        )
+    restart = "" if state.kind is BlockKind.IN_FLIGHT else '<p><a href="/">Nouvelle recherche</a></p>'
+    return f"<h2>Confirmation</h2>{_error(state.french)}{wired}{retry}{back}{restart}"
+
+
+def _field(
+    label: str,
+    name: str,
+    kind: str,
+    value: str,
+    *,
+    required: bool = False,
+    error: str = "",
+    min_value: str = "",
+    complete: str = "",
+) -> str:
+    required_attr = " required" if required else ""
+    min_attr = f' min="{_e(min_value)}"' if min_value != "" else ""
+    complete_attr = f' autocomplete="{_e(complete)}"' if complete != "" else ""
+    invalid = ' aria-invalid="true"' if error else ""
+    message = f'<span class="error">{_text(error)}</span>' if error else ""
+    return (
+        f"<label><span class=\"label\">{_text(label)}</span>"
+        f'<input type="{kind}" name="{_e(name)}" value="{_e(value)}"{required_attr}{min_attr}{complete_attr}{invalid}>'
+        f"{message}</label>"
+    )
+
+
+def _area(label: str, name: str, value: str, error: str) -> str:
+    invalid = ' aria-invalid="true"' if error else ""
+    message = f'<span class="error">{_text(error)}</span>' if error else ""
+    return (
+        f'<label><span class="label">{_text(label)}</span>'
+        f'<textarea name="{_e(name)}" maxlength="500"{invalid}>{_text(value)}</textarea>'
+        f"{message}</label>"
+    )
+
+
+def _button(label: str, action: str, primary: bool = True) -> str:
+    kind = "primary" if primary else "secondary"
+    return f'<button class="{kind}" type="submit" name="action" value="{_e(action)}">{_text(label)}</button>'
+
+
+def _stay_fields(stay: Stay) -> list[str]:
+    return [
+        _h("check_in", stay.check_in.isoformat()),
+        _h("checkout", stay.checkout.isoformat()),
+        _h("adults", stay.party.adults),
+        _h("children", stay.party.children),
+    ]
+
+
+def _room_fields(state: ChoosingExtras | AskingContact) -> list[str]:
+    return [_h("room_id", int(state.room_id)), _h("room_name", state.room_name)]
+
+
+def _draft_fields(draft: ContactDraft) -> list[str]:
+    return [
+        _h("last_name", draft.last_name),
+        _h("first_name", draft.first_name),
+        _h("email", draft.email),
+        _h("phone", draft.phone),
+        _h("arrival_hour", draft.arrival_hour),
+        _h("remarks", draft.remarks),
+    ]
+
+
+def _chosen_line(catalog: tuple[Extra, ...], selected: tuple[str, ...], stay: Stay) -> str:
+    wanted = set(selected)
+    parts = [
+        f"{extra.label} ({euros(extra.line_cents(stay))})" for extra in catalog if extra.id in wanted
+    ]
+    return ", ".join(parts)
+
+
+def _when(day: date) -> str:
+    return f"{day.day} {_MONTHS[day.month - 1]} {day.year}"
+
+
+def _h(name: str, value: object) -> str:
+    return f'<input type="hidden" name="{_e(name)}" value="{_e(value)}">'
+
+
+def _error(text: str) -> str:
+    if text == "":
+        return ""
+    return f'<p class="error" role="alert">{_text(text)}</p>'
+
+
+def _text(value: object) -> str:
+    return html.escape(str(value), quote=False)
+
+
+def _e(value: object) -> str:
+    return html.escape(str(value), quote=True)

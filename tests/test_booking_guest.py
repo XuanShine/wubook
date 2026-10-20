@@ -1,9 +1,13 @@
+import inspect
+import re
 from datetime import date
 from pathlib import Path
 
 import pytest
+from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
 
+from booking.__main__ import main
 from booking.guest import (
     AskingContact,
     AskingStay,
@@ -12,6 +16,7 @@ from booking.guest import (
     ChoosingExtras,
     ChoosingRoom,
     Done,
+    guest_app,
     load_extras,
     step,
 )
@@ -484,3 +489,293 @@ def test_json_reservation_without_a_phone(tmp_path: Path, monkeypatch: pytest.Mo
     assert len(created) == 1
     assert created[0][5]["phone"] == ""
     assert created[0][6] == float(PLAN_EUROS)
+
+
+def guest_client(tmp_path: Path, proxy: FakeProxy, monkeypatch: pytest.MonkeyPatch, extras_path: Path | None = None):
+    class Clock(date):
+        @classmethod
+        def today(cls) -> date:
+            return TODAY
+
+    monkeypatch.setattr("booking.guest.date", Clock)
+    return TestClient(guest_app(counter(tmp_path, proxy), extras_path=extras_path))
+
+
+def paths_of(app) -> set[str]:
+    return {route.path for route in app.routes if isinstance(route, APIRoute)}
+
+
+_FIVE = {
+    "/rooms",
+    "/rooms/{room_id}/price",
+    "/reservations",
+    "/reservations/{code}",
+    "/reservations/{code}/cancellation",
+}
+
+
+def test_guest_app_adds_only_the_page(tmp_path: Path) -> None:
+    proxy = FakeProxy()
+    assert paths_of(create_app(counter(tmp_path, proxy))) == _FIVE
+    assert paths_of(guest_app(counter(tmp_path, proxy))) == _FIVE | {"/", "/sejour"}
+
+
+def test_home_is_the_french_hotel_page(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("WUBOOK_TOKEN", TOKEN)
+    home = guest_client(tmp_path, FakeProxy(), monkeypatch).get("/")
+
+    assert home.status_code == 200
+    assert "text/html" in home.headers["content-type"]
+    text = home.text
+    assert "<html lang=\"fr\">" in text
+    assert 'name="viewport"' in text
+    assert "Hôtel Panorama" in text
+    assert "Grasse" in text
+    for label in ("Dates", "Chambres", "Extras", "Coordonnées", "Confirmation"):
+        assert label in text
+    for color in ("#f3efe6", "#1e2a24", "#1f4d3a", "#a6844a", "#fffcf7", "#8f2d2d"):
+        assert color in text
+    assert "Iowan Old Style" in text
+    assert "Palatino" in text
+    assert "Avenir Next" in text
+    assert "72rem" in text
+    assert "minmax(16rem, 1fr)" in text
+    assert "48px" in text
+    assert "700px" in text
+    assert "purple" not in text.lower()
+    assert "<link" not in text
+    assert "<script" not in text
+    assert TOKEN not in text
+    assert 'aria-current="step"' in text
+
+
+def test_page_books_the_quoted_room(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    proxy = FakeProxy()
+    install_booking(proxy)
+    http = guest_client(tmp_path, proxy, monkeypatch)
+    stay_fields = {
+        "check_in": "2026-12-14",
+        "checkout": "2026-12-15",
+        "adults": "1",
+        "children": "0",
+    }
+    rooms = http.post("/sejour", content=_body({"action": "stay", **stay_fields}), headers=_FORM)
+    assert "text/html" in rooms.headers["content-type"]
+    assert "Double" in rooms.text
+    assert "100,00 €" in rooms.text
+    assert len(methods(proxy, "fetch_rooms_values")) == 1
+
+    extras = http.post("/sejour", data={**stay_fields, "action": "room", "room_id": str(OPEN_ID), "room_name": "Double"})
+    assert "Petit-déjeuner" in extras.text
+    assert "à régler à l'hôtel" in extras.text
+    assert len(methods(proxy, "fetch_rooms_values")) == 1
+
+    contact = http.post(
+        "/sejour",
+        data={**stay_fields, "action": "extras", "room_id": str(OPEN_ID), "room_name": "Double", "extra": ["petit_dejeuner", "parking"]},
+    )
+    assert "Confirmer la réservation" in contact.text
+    assert 'name="key"' in contact.text
+    assert methods(proxy, "new_reservation") == []
+    assert len(methods(proxy, "fetch_rooms_values")) == 1
+    found = re.search(r'name="key" value="([0-9a-f]+)"', contact.text)
+    assert found is not None
+    done = http.post(
+        "/sejour",
+        data={
+            **stay_fields,
+            "action": "contact",
+            "room_id": str(OPEN_ID),
+            "room_name": "Double",
+            "extra": ["petit_dejeuner", "parking"],
+            "key": found.group(1),
+            "last_name": "Ng",
+            "first_name": "Panorama",
+            "email": "p@example.com",
+            "phone": "+33420000000",
+            "arrival_hour": "18:00",
+            "amount": "1",
+            "total_cents": "1",
+            "currency": "USD",
+        },
+    )
+    again = http.post(
+        "/sejour",
+        data={
+            **stay_fields,
+            "action": "contact",
+            "room_id": str(OPEN_ID),
+            "room_name": "Double",
+            "extra": ["petit_dejeuner", "parking"],
+            "key": found.group(1),
+            "last_name": "Ng",
+            "first_name": "Panorama",
+            "email": "p@example.com",
+            "phone": "+33420000000",
+            "arrival_hour": "18:00",
+        },
+    )
+
+    assert CODE in done.text
+    assert "100,00 €" in done.text
+    assert "À régler à l'hôtel" in done.text
+    assert "Petit-déjeuner (14,00 €)" in done.text
+    assert TOKEN not in done.text
+    assert 'name="amount"' not in done.text
+    assert 'name="total_cents"' not in done.text
+    assert CODE in again.text
+    created = methods(proxy, "new_reservation")
+    assert len(created) == 1
+    assert created[0][6] == float(PLAN_EUROS)
+    assert created[0][5]["notes"] == "Extras à régler à l'hôtel : Petit-déjeuner (14,00 €), Parking (15,00 €)"
+    assert created[0][9] == {"idempotency_key": found.group(1)}
+
+
+def test_page_escapes_room_names_and_guest_text(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    proxy = FakeProxy()
+    install(proxy)
+    proxy.handlers["fetch_rooms"] = lambda *args: (
+        0,
+        [row(OPEN_ID, "<img src=x onerror=alert(1)>", 2, PRICE_PARENT), row(CLOSED_ID, "Suite", 2)],
+    )
+    http = guest_client(tmp_path, proxy, monkeypatch)
+    rooms = http.post(
+        "/sejour",
+        data={"action": "stay", "check_in": "2026-12-14", "checkout": "2026-12-15", "adults": "1", "children": "0"},
+    )
+    held = http.post(
+        "/sejour",
+        content=_body(
+            {
+                "action": "contact",
+                "check_in": "2026-12-14",
+                "checkout": "2026-12-15",
+                "adults": "1",
+                "children": "0",
+                "room_id": str(OPEN_ID),
+                "last_name": '"><b>',
+                "first_name": "Panorama",
+                "email": "p@example.com",
+                "phone": "",
+                "arrival_hour": "18:00",
+                "remarks": "a=b&c <ok>",
+                "key": "abc123",
+            }
+        ),
+        headers=_FORM,
+    )
+
+    assert "<img" not in rooms.text
+    assert "&lt;img" in rooms.text
+    assert "<b>" not in held.text
+    assert "&lt;b&gt;" in held.text
+    assert "a=b&amp;c &lt;ok&gt;" in held.text
+    assert methods(proxy, "new_reservation") == []
+
+
+def test_wired_rejection_stays_html_and_retries_the_same_key(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    proxy = FakeProxy()
+    install_booking(proxy)
+    proxy.handlers["new_reservation"] = lambda *args: (-9, f"refus <b>ce soir</b> {TOKEN}")
+    http = guest_client(tmp_path, proxy, monkeypatch)
+    fields = contact_fields(adults="1", extra=["petit_dejeuner"])
+    fields.pop("key")
+    contact = http.post("/sejour", data={**fields, "action": "extras"})
+    found = re.search(r'name="key" value="([0-9a-f]+)"', contact.text)
+    assert found is not None
+    failed = http.post("/sejour", data={**fields, "action": "contact", "key": found.group(1)})
+    retried = http.post(
+        "/sejour",
+        data={**fields, "action": "retry", "outcome": "rejected", "key": found.group(1)},
+    )
+
+    assert "text/html" in failed.headers["content-type"]
+    assert "La réservation n'a pas été acceptée" in failed.text
+    assert "ce soir" in failed.text
+    assert "<b>" not in failed.text
+    assert TOKEN not in failed.text
+    assert CODE not in failed.text
+    assert "La réservation n'a pas été acceptée" in retried.text
+    assert TOKEN not in retried.text
+    assert CODE not in retried.text
+    created = methods(proxy, "new_reservation")
+    assert {call[9]["idempotency_key"] for call in created} == {found.group(1)}
+
+
+def test_wired_down_is_french_html(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    proxy = FakeProxy()
+
+    def boom(*args: object) -> object:
+        raise OSError("down")
+
+    proxy.handlers["fetch_rooms"] = boom
+    response = guest_client(tmp_path, proxy, monkeypatch).post(
+        "/sejour",
+        data={"action": "stay", "check_in": "2026-12-14", "checkout": "2026-12-15", "adults": "2", "children": "0"},
+    )
+
+    assert "text/html" in response.headers["content-type"]
+    assert "indisponible" in response.text
+    assert "Wired is unavailable" not in response.text
+    assert not response.text.lstrip().startswith("{")
+
+
+def test_inflight_page_has_no_back(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    proxy = FakeProxy()
+    install_booking(proxy)
+    proxy.handlers["fetch_bookings"] = lambda *args: (
+        0,
+        [{"reservation_code": str(index), "ancillary": {"idempotency_key": "other"}} for index in range(120)],
+    )
+    http = guest_client(tmp_path, proxy, monkeypatch)
+    fields = contact_fields(extra="parking")
+    page = http.post("/sejour", data=fields)
+
+    assert "déjà en cours" in page.text
+    assert 'value="retry"' in page.text
+    assert 'value="back"' not in page.text
+    assert methods(proxy, "new_reservation") == []
+    assert TOKEN not in page.text
+
+
+def test_empty_catalog_page_keeps_the_extras_sentence(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    page = guest_client(tmp_path, FakeProxy(), monkeypatch, extras_path=tmp_path / "missing.yml").post(
+        "/sejour",
+        data={"action": "room", "check_in": "2026-12-14", "checkout": "2026-12-15", "adults": "2", "children": "0", "room_id": str(OPEN_ID)},
+    )
+
+    assert "Aucun extra n'est proposé pour le moment." in page.text
+    assert "Continuer" in page.text
+
+
+def test_broken_extras_crash_guest_app(tmp_path: Path) -> None:
+    path = tmp_path / "extras.yml"
+    path.write_text(":\n", encoding="utf-8")
+    with pytest.raises(ValueError):
+        guest_app(counter(tmp_path, FakeProxy()), extras_path=path)
+
+
+def test_back_from_extras_does_not_pull(tmp_path: Path) -> None:
+    proxy = FakeProxy()
+    install(proxy)
+    booked = counter(tmp_path, proxy)
+    step(booked, stay_form(action="stay"), TODAY)
+    pulls = len(methods(proxy, "fetch_rooms_values"))
+    backed = step(booked, stay_form(action="back", room_id=str(OPEN_ID), room_name="Double"), TODAY)
+
+    assert isinstance(backed, AskingStay)
+    assert backed.check_in == "2026-12-14"
+    assert len(methods(proxy, "fetch_rooms_values")) == pulls
+
+
+def test_main_serves_the_guest_app() -> None:
+    assert "guest_app(Counter.open())" in inspect.getsource(main)
+
+
+_FORM = {"content-type": "application/x-www-form-urlencoded"}
+
+
+def _body(fields: dict[str, str]) -> bytes:
+    from urllib.parse import urlencode
+
+    return urlencode(fields).encode()
