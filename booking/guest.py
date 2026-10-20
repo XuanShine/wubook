@@ -495,17 +495,7 @@ def _submit_contact(
     errors = _contact_errors(ready.draft)
     key = _posted_key(fields)
     if key is None:
-        # place never mints. An empty key is a forged post, not a new attempt.
-        return AskingContact(
-            ready.stay,
-            ready.room_id,
-            ready.room_name,
-            catalog,
-            ready.selected,
-            ready.draft,
-            IdempotencyKey(uuid4().hex),
-            errors + (("key", "Envoyez à nouveau le formulaire."),),
-        )
+        return _show_contact_again(ready, catalog, errors)
     if errors:
         return AskingContact(
             ready.stay,
@@ -527,6 +517,23 @@ def _submit_contact(
         key,
         today,
         hidden,
+    )
+
+
+def _show_contact_again(
+    ready: _Ready,
+    catalog: tuple[Extra, ...],
+    errors: tuple[tuple[str, str], ...],
+) -> AskingContact:
+    return AskingContact(
+        ready.stay,
+        ready.room_id,
+        ready.room_name,
+        catalog,
+        ready.selected,
+        ready.draft,
+        IdempotencyKey(uuid4().hex),
+        errors + (("key", "Envoyez à nouveau le formulaire."),),
     )
 
 
