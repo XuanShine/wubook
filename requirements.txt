@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-nicegui
-pyyaml
-python-dotenv
-pytest
-httpx
