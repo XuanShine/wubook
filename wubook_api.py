@@ -47,25 +47,18 @@ url = "https://wired.wubook.net/xrws/"
 # TODO: faire attention au fichier de logs
 
 # LOAD ID
-user = os.getenv('WUBOOK_USER')
-pkey = os.getenv('WUBOOK_PKEY')
+TOKEN = os.getenv('WUBOOK_TOKEN')
 lcode = os.getenv('WUBOOK_LCODE')
-password = os.getenv('WUBOOK_PASSWORD')
+
 
 MIN_PRICE = 45
 
 class Wubook:
     def __init__(self, *args, **kwargs):
         self.server = xmlrpc.client.ServerProxy(url, verbose=False)
-        self.returnCode, self.token = self.server.acquire_token(user, password, pkey)
-        if self.returnCode != 0:
-            logger.warning("Can’t connect to server")
-        else:
-            logger.info("Server connected")
-    
 
     def __enter__(self):
-        return self.server, self.token
+        return self.server, TOKEN
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
         if exception_type != None:
@@ -76,7 +69,7 @@ class Wubook:
                 pass
             else:
                 try:
-                    self.server.release_token(self.token)
+                    self.server.release_token(TOKEN)
                 except xmlrpc.client.ProtocolError as e:
                     logger.warning(
                         f"ProtocolError while realeasing token from wubook server: \n{e}"
@@ -85,13 +78,13 @@ class Wubook:
                     logger.info("Server disconnected")
     
     def fetch_rooms(self):
-        return self.server.fetch_rooms(self.token, lcode)
+        return self.server.fetch_rooms(TOKEN, lcode)
     
     def fetch_room(self, room_id):
-        return self.server.fetch_single_room(self.token, lcode, room_id)
+        return self.server.fetch_single_room(TOKEN, lcode, room_id)
     
     def room_images(self, room_id):
-        return self.server.room_images(self.token, lcode, room_id)
+        return self.server.room_images(TOKEN, lcode, room_id)
     
     def fetch_rooms_values(self, dfrom, dto_included, rooms=None):
         """_summary_
@@ -104,8 +97,8 @@ class Wubook:
         Returns:
             _type_: _description_
         """
-        # return self.server.fetch_rooms_values(self.token, lcode, dfrom, dto, rooms)
-        return self.server.fetch_rooms_values(self.token, lcode, dfrom, dto_included)
+        # return self.server.fetch_rooms_values(TOKEN, lcode, dfrom, dto, rooms)
+        return self.server.fetch_rooms_values(TOKEN, lcode, dfrom, dto_included)
 
     def update_plan_prices(self, plan_id, dfrom, prices):
         """Upload prices
@@ -123,7 +116,7 @@ class Wubook:
         Returns:
             _type_: _description_
         """
-        return self.server.update_plan_prices(self.token, lcode, plan_id, dfrom, prices)
+        return self.server.update_plan_prices(TOKEN, lcode, plan_id, dfrom, prices)
     
     def fetch_plan_prices(self, plan_id, dfrom, dto, rooms=None):
         """
@@ -134,10 +127,10 @@ class Wubook:
             pid (_type_): _description_
             dfrom (_type_): _description_
         """
-        return self.server.fetch_plan_prices(self.token, lcode, plan_id, dfrom, dto, rooms)
+        return self.server.fetch_plan_prices(TOKEN, lcode, plan_id, dfrom, dto, rooms)
 
     def fetch_booking(self, reservation_code, ancillary=False):
-        return self.server.fetch_booking(self.token, lcode, reservation_code, ancillary)
+        return self.server.fetch_booking(TOKEN, lcode, reservation_code, ancillary)
     
     def new_reservation(self, dfrom, dto, rooms, customer, amount, origin, ccard, ancillary, guests, ignore_restrs, ignore_avail, status):
         """_summary_
@@ -191,7 +184,7 @@ class Wubook:
         Returns:
             _type_: _description_
         """
-        return self.server.new_reservation(self.token, lcode, dfrom, dto, rooms, customer, amount, origin, ccard, ancillary, guests, ignore_restrs, ignore_avail, status)
+        return self.server.new_reservation(TOKEN, lcode, dfrom, dto, rooms, customer, amount, origin, ccard, ancillary, guests, ignore_restrs, ignore_avail, status)
     
 
 def get_avail(dfrom, dto):
