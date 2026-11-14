@@ -48,12 +48,15 @@ url = "https://wired.wubook.net/xrws/"
 
 # LOAD ID
 TOKEN = os.getenv('WUBOOK_TOKEN')
-lcode = os.getenv('WUBOOK_LCODE')
+LCODE = os.getenv('WUBOOK_LCODE')
 
 
 MIN_PRICE = 45
 
 class Wubook:
+    token = TOKEN
+    lcode = LCODE
+    
     def __init__(self, *args, **kwargs):
         self.server = xmlrpc.client.ServerProxy(url, verbose=False)
 
@@ -78,13 +81,13 @@ class Wubook:
                     logger.info("Server disconnected")
     
     def fetch_rooms(self):
-        return self.server.fetch_rooms(TOKEN, lcode)
+        return self.server.fetch_rooms(TOKEN, LCODE)
     
     def fetch_room(self, room_id):
-        return self.server.fetch_single_room(TOKEN, lcode, room_id)
+        return self.server.fetch_single_room(TOKEN, LCODE, room_id)
     
     def room_images(self, room_id):
-        return self.server.room_images(TOKEN, lcode, room_id)
+        return self.server.room_images(TOKEN, LCODE, room_id)
     
     def fetch_rooms_values(self, dfrom, dto_included, rooms=None):
         """_summary_
@@ -97,8 +100,8 @@ class Wubook:
         Returns:
             _type_: _description_
         """
-        # return self.server.fetch_rooms_values(TOKEN, lcode, dfrom, dto, rooms)
-        return self.server.fetch_rooms_values(TOKEN, lcode, dfrom, dto_included)
+        # return self.server.fetch_rooms_values(TOKEN, LCODE, dfrom, dto, rooms)
+        return self.server.fetch_rooms_values(TOKEN, LCODE, dfrom, dto_included)
 
     def update_plan_prices(self, plan_id, dfrom, prices):
         """Upload prices
@@ -116,21 +119,21 @@ class Wubook:
         Returns:
             _type_: _description_
         """
-        return self.server.update_plan_prices(TOKEN, lcode, plan_id, dfrom, prices)
+        return self.server.update_plan_prices(TOKEN, LCODE, plan_id, dfrom, prices)
     
     def fetch_plan_prices(self, plan_id, dfrom, dto, rooms=None):
         """
 
         Args:
             token (_type_): _description_
-            lcode (_type_): _description_
+            LCODE (_type_): _description_
             pid (_type_): _description_
             dfrom (_type_): _description_
         """
-        return self.server.fetch_plan_prices(TOKEN, lcode, plan_id, dfrom, dto, rooms)
+        return self.server.fetch_plan_prices(TOKEN, LCODE, plan_id, dfrom, dto, rooms)
 
     def fetch_booking(self, reservation_code, ancillary=False):
-        return self.server.fetch_booking(TOKEN, lcode, reservation_code, ancillary)
+        return self.server.fetch_booking(TOKEN, LCODE, reservation_code, ancillary)
     
     def new_reservation(self, dfrom, dto, rooms, customer, amount, origin, ccard, ancillary, guests, ignore_restrs, ignore_avail, status):
         """_summary_
@@ -184,7 +187,7 @@ class Wubook:
         Returns:
             _type_: _description_
         """
-        return self.server.new_reservation(TOKEN, lcode, dfrom, dto, rooms, customer, amount, origin, ccard, ancillary, guests, ignore_restrs, ignore_avail, status)
+        return self.server.new_reservation(TOKEN, LCODE, dfrom, dto, rooms, customer, amount, origin, ccard, ancillary, guests, ignore_restrs, ignore_avail, status)
     
 
 def get_avail(dfrom, dto):
@@ -198,7 +201,7 @@ def get_avail(dfrom, dto):
     if datetime.strptime(dfrom, "%d/%m/%Y").date() < date.today():
         dfrom = date.today().strftime("%d/%m/%Y")
     with Wubook() as (server, token):
-        return_code, avail = server.fetch_rooms_values(token, lcode, dfrom, dto)
+        return_code, avail = server.fetch_rooms_values(token, LCODE, dfrom, dto)
 
     if return_code != 0:
         raise ConnectionError(f"in get_avail({dfrom}, {dto}) error: {avail}")
@@ -224,8 +227,8 @@ def get_prices_avail_today():
         dnow = datetime.now() - timedelta(days=1)
     dfrom = dto = dnow.strftime("%d/%m/%Y")
     with Wubook() as (server, token):
-        return_code, plan_prices = server.fetch_plan_prices(token, lcode, 0, dfrom, dto)
-        return_code2, avails = server.fetch_rooms_values(token, lcode, dfrom, dto)
+        return_code, plan_prices = server.fetch_plan_prices(token, LCODE, 0, dfrom, dto)
+        return_code2, avails = server.fetch_rooms_values(token, LCODE, dfrom, dto)
     if return_code != 0:
         raise ConnectionError(f"in get_prices_today(), error: {plan_prices}")
     if return_code2 != 0:
@@ -247,5 +250,5 @@ def upload_prices(dfrom, prices, pid=0):
         }
     """
     with Wubook() as (server, token):
-        logger.debug(server.update_plan_prices(token, lcode, pid, dfrom, prices))
+        logger.debug(server.update_plan_prices(token, LCODE, pid, dfrom, prices))
 
